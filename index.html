@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Artemis II — Return to the Moon</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="description" content="Live countdown to NASA's Artemis II mission — the first crewed lunar flyby in over 54 years. Crew, timeline, vehicle specs, and more.">
+  <meta property="og:title" content="Artemis II — Return to the Moon">
+  <meta property="og:description" content="Live countdown to NASA's Artemis II launch. The first crewed mission beyond low Earth orbit since Apollo 17.">
+  <meta property="og:image" content="images/mission-patch.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Artemis II — Return to the Moon">
+  <meta name="twitter:description" content="Live countdown to NASA's Artemis II launch. First crewed lunar flyby in 54 years.">
+  <meta name="twitter:image" content="images/mission-patch.png">
   <style>
     /* ========== SELF-HOSTED FONTS ========== */
     @font-face {
@@ -337,11 +347,15 @@
 
     /* ========== FADE-IN ========== */
     .fade-in {
-      opacity: 0;
-      transform: translateY(24px);
+      opacity: 1;
+      transform: translateY(0);
       transition: opacity 0.7s ease-out, transform 0.7s ease-out;
     }
-    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .js-loaded .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    .js-loaded .fade-in.visible { opacity: 1; transform: translateY(0); }
     .fade-in-delay-1 { transition-delay: 0.1s; }
     .fade-in-delay-2 { transition-delay: 0.2s; }
     .fade-in-delay-3 { transition-delay: 0.3s; }
@@ -702,6 +716,156 @@
       letter-spacing: 1px;
     }
 
+    /* ========== WATCH LIVE ========== */
+    .watch-live {
+      background: linear-gradient(180deg, transparent, rgba(12,8,8,0.5), transparent);
+    }
+    .watch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    .watch-schedule {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .schedule-item {
+      background: rgba(3,3,8,0.95);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .schedule-time {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+      min-width: 120px;
+    }
+    .schedule-label {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.35);
+    }
+    .schedule-item.active .schedule-time { color: #fff; }
+    .schedule-item.active .schedule-label { color: rgba(255,255,255,0.6); }
+    .watch-content h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+    .watch-content p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    .watch-btn {
+      display: inline-block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0.8rem 1.8rem;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      color: rgba(255,255,255,0.7);
+      transition: all 0.3s;
+    }
+    .watch-btn:hover {
+      border-color: rgba(255,255,255,0.4);
+      color: #fff;
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ========== COMPARISON ========== */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 1.2rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .comparison-table th {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .comparison-table th:first-child { color: rgba(255,255,255,0.2); }
+    .comparison-table td:first-child {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+    }
+    .comparison-table td {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.55);
+    }
+    .comparison-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ========== FAQ ========== */
+    #faq { background: linear-gradient(180deg, transparent, rgba(8,8,16,0.5), transparent); }
+    .faq-list { max-width: 800px; }
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 1.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+    }
+    .faq-question span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 1px;
+    }
+    .faq-toggle {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.2);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .faq-item.open .faq-answer { max-height: 200px; }
+    .faq-answer p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.8;
+      padding-bottom: 1.5rem;
+    }
+
     /* ========== FOOTER ========== */
     footer {
       position: relative;
@@ -776,6 +940,8 @@
       .stats-row { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
       .records-grid { grid-template-columns: 1fr; }
       .facts-grid { grid-template-columns: repeat(2, 1fr); }
+      .watch-grid { grid-template-columns: 1fr; }
+      .comparison-table th, .comparison-table td { padding: 0.8rem 0.75rem; font-size: 0.8rem; }
       .footer-inner { flex-direction: column; gap: 1.5rem; text-align: center; align-items: center; }
       .footer-links { align-items: center; }
       .hero-moon { width: 300px; height: 300px; }
@@ -802,6 +968,8 @@
         <li><a href="#timeline">Timeline</a></li>
         <li><a href="#records">History</a></li>
         <li><a href="#facts">Facts</a></li>
+        <li><a href="#watch">Live</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ul>
       <button class="nav-hamburger" id="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -1178,6 +1346,169 @@
     </div>
   </section>
 
+  <!-- Watch Live -->
+  <section class="watch-live" id="watch">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">07 / Launch Day</div>
+        <h2 class="section-title">WATCH LIVE</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="watch-grid fade-in">
+        <div class="watch-content">
+          <h3>NASA LIVE BROADCAST</h3>
+          <p>Full launch coverage begins at 12:50 PM EDT on NASA TV, with the launch window opening at 6:24 PM EDT. Coverage includes pre-launch commentary, crew suit-up, and real-time mission updates from Kennedy Space Center.</p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            <a href="https://www.youtube.com/@NASA/streams" target="_blank" rel="noopener" class="watch-btn">YouTube</a>
+            <a href="https://plus.nasa.gov/scheduled-video/nasas-artemis-ii-crew-launches-to-the-moon-official-broadcast/" target="_blank" rel="noopener" class="watch-btn">NASA+</a>
+            <a href="https://www.nasa.gov/live/" target="_blank" rel="noopener" class="watch-btn">NASA Live</a>
+          </div>
+        </div>
+        <div class="watch-schedule">
+          <div class="schedule-item">
+            <div class="schedule-time">7:45 AM EDT</div>
+            <div class="schedule-label">Tanking coverage begins</div>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-time">12:50 PM EDT</div>
+            <div class="schedule-label">Full launch broadcast begins</div>
+          </div>
+          <div class="schedule-item active">
+            <div class="schedule-time">6:24 PM EDT</div>
+            <div class="schedule-label">Launch window opens</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Apollo vs Artemis -->
+  <section id="comparison">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">08 / Then & Now</div>
+        <h2 class="section-title">APOLLO VS ARTEMIS</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="fade-in" style="overflow-x:auto;">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Apollo (1968-1972)</th>
+              <th>Artemis II (2026)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Rocket</td>
+              <td>Saturn V — 363 ft, 7.5M lbs thrust</td>
+              <td>SLS — 322 ft, 8.8M lbs thrust</td>
+            </tr>
+            <tr>
+              <td>Spacecraft</td>
+              <td>Apollo CSM — 12.8 ft diameter</td>
+              <td>Orion — 16.5 ft diameter, 50% more volume</td>
+            </tr>
+            <tr>
+              <td>Crew</td>
+              <td>3 astronauts, all American men</td>
+              <td>4 astronauts, includes first woman and first Canadian</td>
+            </tr>
+            <tr>
+              <td>Heat Shield</td>
+              <td>Ablative, rated ~5,000 F</td>
+              <td>Largest ever built, 16.5 ft, rated ~5,000 F</td>
+            </tr>
+            <tr>
+              <td>Computing</td>
+              <td>Apollo Guidance Computer — 74 KB memory</td>
+              <td>Orion avionics — millions of times more powerful</td>
+            </tr>
+            <tr>
+              <td>Navigation</td>
+              <td>Star sightings + ground tracking</td>
+              <td>GPS, star trackers, optical navigation camera</td>
+            </tr>
+            <tr>
+              <td>Communications</td>
+              <td>S-band radio, limited bandwidth</td>
+              <td>S-band + Ka-band, HD video from deep space</td>
+            </tr>
+            <tr>
+              <td>Re-entry</td>
+              <td>Direct entry, ~25,000 mph</td>
+              <td>Skip entry (bounces off atmosphere to reduce G-forces)</td>
+            </tr>
+            <tr>
+              <td>Recovery</td>
+              <td>Pacific Ocean, aircraft carrier</td>
+              <td>Pacific Ocean, Navy recovery ship</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">09 / Questions</div>
+        <h2 class="section-title">FAQ</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="faq-list fade-in">
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Why aren't they landing on the Moon?</span>
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Artemis II is a test flight. Its job is to prove that Orion and SLS can safely support a crew in deep space before NASA commits to a landing. The lunar landing comes on Artemis III, which will use a separate lander (SpaceX Starship HLS) to touch down on the surface.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>How is this different from Apollo?</span>
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Artemis uses modern spacecraft with vastly more capable computers, communications, and life support. Orion is larger than Apollo, carries 4 instead of 3, and uses a skip re-entry technique never tested with a crew. The mission is also more diverse and international than any Apollo flight.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What is a free-return trajectory?</span>
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>A flight path that uses the Moon's gravity to swing the spacecraft back toward Earth without requiring an engine burn. If the main engine fails after TLI, the crew still comes home safely. Apollo 13 famously relied on this same principle to survive.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Why is the re-entry so fast?</span>
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Returning from lunar distance means Orion falls back through Earth's gravity well at ~25,000 mph — far faster than returning from the ISS (~17,500 mph). The skip-entry technique has Orion dip into the atmosphere, bounce back up, then re-enter, spreading out the heating and G-forces.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What comes after Artemis II?</span>
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Artemis III will be the first crewed lunar landing since 1972, targeting the Moon's south pole. Astronauts will use SpaceX's Starship Human Landing System to descend to the surface. Later Artemis missions aim to build a sustained human presence on and around the Moon.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer>
     <div class="footer-inner">
@@ -1320,10 +1651,18 @@
     setInterval(updateCountdown, 1000);
 
     // ========== SCROLL ANIMATIONS ==========
+    // Mark elements already in viewport as visible before enabling animations
+    const fadeEls = document.querySelectorAll('.fade-in');
+    fadeEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) el.classList.add('visible');
+    });
+    document.body.classList.add('js-loaded');
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
     }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    fadeEls.forEach(el => observer.observe(el));
 
     // ========== NAV ==========
     const navbar = document.getElementById('navbar');
@@ -1335,6 +1674,14 @@
     });
     document.querySelectorAll('#navLinks a').forEach(a => {
       a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+    });
+
+    // ========== FAQ TOGGLES ==========
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        item.classList.toggle('open');
+      });
     });
   </script>
 </body>
