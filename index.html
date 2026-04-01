@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artemis II — Return to the Moon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #030308;
+      color: #c8c8d0;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+    a { color: inherit; text-decoration: none; }
+    a.crew-card, a.vehicle-card { display: block; }
+    .inline-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.4);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 1px;
+      transition: all 0.3s;
+    }
+    .inline-link:hover {
+      color: rgba(255,255,255,0.7);
+      border-bottom-color: rgba(255,255,255,0.3);
+    }
+
+    /* ========== CANVAS STARS ========== */
+    #starfield {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ========== NAV ========== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(3,3,8,0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: all 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(3,3,8,0.92);
+      border-bottom-color: rgba(100,160,255,0.08);
+    }
+    .nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.7);
+    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: rgba(255,255,255,0.9); }
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: rgba(255,255,255,0.5);
+      transition: all 0.3s;
+    }
+
+    /* ========== HERO ========== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      z-index: 2;
+    }
+
+    /* Moon CSS art */
+    .hero-moon {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #2a2a3a, #18181f 50%, #0a0a10 100%);
+      box-shadow:
+        inset -30px -20px 60px rgba(0,0,0,0.6),
+        inset 10px 10px 40px rgba(60,60,80,0.15),
+        0 0 120px rgba(80,100,140,0.08),
+        0 0 300px rgba(60,80,120,0.04);
+      opacity: 0.18;
+      z-index: -1;
+      animation: moonFloat 20s ease-in-out infinite;
+    }
+    @keyframes moonFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.45rem 1.4rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 2.5rem;
+      animation: fadeInDown 0.8s ease-out;
+    }
+    .hero-badge .pulse {
+      width: 6px; height: 6px;
+      background: #5b8a5e;
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    .hero-patch {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      animation: fadeInDown 1s ease-out;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(3rem, 8vw, 7.5rem);
+      font-weight: 900;
+      letter-spacing: 8px;
+      line-height: 1.05;
+      margin-bottom: 0.6rem;
+      animation: fadeInDown 1.2s ease-out;
+      color: #fff;
+    }
+    .hero-subtitle {
+      font-size: clamp(0.85rem, 2vw, 1.15rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-bottom: 4rem;
+      animation: fadeInDown 1.4s ease-out;
+    }
+
+    /* ========== COUNTDOWN ========== */
+    .countdown-container { animation: fadeInUp 1.6s ease-out; }
+    .countdown-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+    .countdown {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .countdown-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 100px;
+      padding: 1rem 0.5rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 12px;
+    }
+    .countdown-value {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .countdown-unit {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      margin-top: 0.6rem;
+    }
+    .countdown-separator {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: rgba(255,255,255,0.1);
+      line-height: 1;
+      padding-top: 1rem;
+    }
+    .countdown-post-launch {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: 700;
+      color: #5b8a5e;
+      letter-spacing: 6px;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+      color: rgba(255,255,255,0.15);
+    }
+    .hero-scroll span {
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; height: 40px; }
+      50% { opacity: 1; height: 50px; }
+    }
+
+    /* ========== SECTIONS ========== */
+    section {
+      position: relative;
+      z-index: 2;
+      padding: 8rem 2rem;
+    }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-header { margin-bottom: 5rem; }
+    .section-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #fff;
+    }
+    .section-line {
+      width: 40px;
+      height: 1px;
+      background: rgba(255,255,255,0.15);
+      margin-top: 1.5rem;
+    }
+
+    /* ========== FADE-IN ========== */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .fade-in-delay-1 { transition-delay: 0.1s; }
+    .fade-in-delay-2 { transition-delay: 0.2s; }
+    .fade-in-delay-3 { transition-delay: 0.3s; }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========== OVERVIEW ========== */
+    .overview-intro {
+      max-width: 700px;
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 4rem;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 4rem;
+    }
+    .overview-card {
+      background: rgba(3,3,8,0.95);
+      padding: 2.5rem 2rem;
+      transition: background 0.4s;
+    }
+    .overview-card:hover { background: rgba(255,255,255,0.03); }
+    .overview-card-icon {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 1.2rem;
+      stroke: rgba(255,255,255,0.25);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .overview-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 0.8rem;
+    }
+    .overview-card p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.8;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+    .stat-item { text-align: center; }
+    .stat-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      margin-top: 0.5rem;
+    }
+
+    /* ========== CREW ========== */
+    #crew { background: linear-gradient(180deg, transparent, rgba(8,8,16,0.5), transparent); }
+    .crew-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    .crew-card {
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.4s;
+      background: rgba(255,255,255,0.01);
+    }
+    .crew-card:hover {
+      border-color: rgba(255,255,255,0.1);
+      transform: translateY(-4px);
+    }
+    .crew-img-wrap {
+      position: relative;
+      aspect-ratio: 3/3.8;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0c0c18, #060610);
+    }
+    .crew-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(30%) brightness(0.9);
+      transition: all 0.5s;
+    }
+    .crew-card:hover .crew-img {
+      filter: grayscale(0%) brightness(1);
+      transform: scale(1.04);
+    }
+    .crew-img-gradient {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60%;
+      background: linear-gradient(transparent, rgba(3,3,8,1));
+    }
+    .crew-flag-label {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      padding: 0.25rem 0.6rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+    }
+    .crew-info { padding: 1.5rem; }
+    .crew-role {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 0.4rem;
+    }
+    .crew-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+    }
+    .crew-bio {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+    .crew-milestone {
+      display: inline-block;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ========== VEHICLES ========== */
+    .vehicles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .vehicle-card {
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.01);
+      transition: all 0.4s;
+    }
+    .vehicle-card:hover {
+      border-color: rgba(255,255,255,0.08);
+      transform: translateY(-3px);
+    }
+    .vehicle-img-wrap {
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0a0a16, #050510);
+    }
+    .vehicle-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+      filter: brightness(0.85);
+    }
+    .vehicle-card:hover .vehicle-img {
+      transform: scale(1.04);
+      filter: brightness(1);
+    }
+    .vehicle-content { padding: 2rem; }
+    .vehicle-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 2px;
+      margin-bottom: 0.3rem;
+    }
+    .vehicle-sub {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 1.5rem;
+    }
+    .vehicle-specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .spec-item {
+      padding: 0.75rem;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .spec-label {
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      margin-bottom: 0.2rem;
+    }
+    .spec-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.75);
+      font-weight: 700;
+    }
+
+    /* ========== TIMELINE ========== */
+    #timeline { background: linear-gradient(180deg, transparent, rgba(8,8,16,0.5), transparent); }
+    .timeline { position: relative; max-width: 800px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(255,255,255,0.08), transparent);
+    }
+    .timeline-item {
+      position: relative;
+      padding-left: 3.5rem;
+      padding-bottom: 3.5rem;
+    }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-dot {
+      position: absolute;
+      left: -3px;
+      top: 6px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      border: none;
+    }
+    .timeline-item:first-child .timeline-dot {
+      background: #fff;
+      box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    }
+    .timeline-day {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .timeline-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+    }
+    .timeline-desc {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.8;
+    }
+    .timeline-desc strong { color: rgba(255,255,255,0.6); font-weight: 600; }
+
+    /* ========== RECORDS ========== */
+    .records-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .record-card {
+      background: rgba(3,3,8,0.95);
+      padding: 2.5rem 2rem;
+      transition: background 0.4s;
+    }
+    .record-card:hover { background: rgba(255,255,255,0.03); }
+    .record-number {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.12);
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+    .record-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 1px;
+      margin-bottom: 0.6rem;
+    }
+    .record-card p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.7;
+    }
+
+    /* ========== FACTS ========== */
+    #facts { background: linear-gradient(180deg, transparent, rgba(8,8,16,0.5), transparent); }
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .fact-card {
+      background: rgba(3,3,8,0.95);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      transition: background 0.4s;
+    }
+    .fact-card:hover { background: rgba(255,255,255,0.03); }
+    .fact-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .fact-label {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 1px;
+    }
+
+    /* ========== FOOTER ========== */
+    footer {
+      position: relative;
+      z-index: 2;
+      padding: 4rem 2rem;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .footer-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.15);
+      margin-bottom: 0.5rem;
+    }
+    .footer-text {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.12);
+      line-height: 1.6;
+    }
+    .footer-text a { color: rgba(255,255,255,0.25); transition: color 0.3s; }
+    .footer-text a:hover { color: rgba(255,255,255,0.5); }
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      align-items: flex-end;
+    }
+    .footer-links a {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 1px;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,0.5); }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1024px) {
+      .overview-grid { grid-template-columns: repeat(2, 1fr); }
+      .crew-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .records-grid { grid-template-columns: repeat(2, 1fr); }
+      .facts-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        background: rgba(3,3,8,0.97);
+        backdrop-filter: blur(24px);
+        padding: 1.5rem 2rem;
+        gap: 1.2rem;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+      }
+      .nav-hamburger { display: flex; }
+      section { padding: 5rem 1.5rem; }
+      .section-header { margin-bottom: 3rem; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .crew-grid { grid-template-columns: 1fr; }
+      .vehicles-grid { grid-template-columns: 1fr; }
+      .vehicle-specs { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+      .records-grid { grid-template-columns: 1fr; }
+      .facts-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-inner { flex-direction: column; gap: 1.5rem; text-align: center; align-items: center; }
+      .footer-links { align-items: center; }
+      .hero-moon { width: 300px; height: 300px; }
+    }
+    @media (max-width: 480px) {
+      .countdown-block { min-width: 65px; padding: 0.75rem 0.3rem; }
+      .countdown { gap: 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Canvas Star Field -->
+  <canvas id="starfield"></canvas>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="https://www.nasa.gov/mission/artemis-ii/" target="_blank" rel="noopener" class="nav-logo">ARTEMIS II</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#overview">Mission</a></li>
+        <li><a href="#crew">Crew</a></li>
+        <li><a href="#vehicles">Vehicles</a></li>
+        <li><a href="#timeline">Timeline</a></li>
+        <li><a href="#records">History</a></li>
+        <li><a href="#facts">Facts</a></li>
+      </ul>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-moon"></div>
+    <div class="hero-badge"><span class="pulse"></span> NASA Artemis Program</div>
+    <a href="https://www.nasa.gov/mission/artemis-ii/" target="_blank" rel="noopener">
+      <img class="hero-patch"
+           src="images/mission-patch.png"
+           alt="Artemis II Mission Patch">
+    </a>
+    <h1>ARTEMIS II</h1>
+    <p class="hero-subtitle">Return to the Moon</p>
+    <div class="countdown-container">
+      <div class="countdown-label">T-minus to launch</div>
+      <div class="countdown" id="countdown"></div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Mission Overview -->
+  <section id="overview">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">01 / The Mission</div>
+        <h2 class="section-title">MISSION OVERVIEW</h2>
+        <div class="section-line"></div>
+      </div>
+      <p class="overview-intro fade-in">
+        Artemis II is humanity's return to deep space. A 10-day crewed test flight around the Moon and back — the first time astronauts have ventured beyond low Earth orbit in over 54 years. Four astronauts will validate every system needed to eventually put boots back on the lunar surface.
+        <a href="https://www.nasa.gov/mission/artemis-ii/" target="_blank" rel="noopener" class="inline-link">Read more on NASA.gov</a>
+      </p>
+      <div class="overview-grid fade-in">
+        <div class="overview-card">
+          <svg class="overview-card-icon" viewBox="0 0 32 32">
+            <circle cx="16" cy="16" r="12" /><path d="M16 4a12 12 0 0 1 0 24" opacity="0.4"/>
+            <circle cx="16" cy="16" r="3" />
+          </svg>
+          <h3>CREWED LUNAR FLYBY</h3>
+          <p>The first crewed flight of Orion and only the second flight of SLS. A free-return trajectory ensures the crew can safely return even if propulsion fails.</p>
+        </div>
+        <div class="overview-card">
+          <svg class="overview-card-icon" viewBox="0 0 32 32">
+            <path d="M16 4v24M8 12l8-8 8 8" /><path d="M6 28h20" />
+          </svg>
+          <h3>SYSTEMS VALIDATION</h3>
+          <p>The primary objective: prove that SLS, Orion, and ground systems can safely support astronauts in deep space. Life support, navigation, communications — all tested under real conditions.</p>
+        </div>
+        <div class="overview-card">
+          <svg class="overview-card-icon" viewBox="0 0 32 32">
+            <path d="M4 16h6l3-8 4 16 3-8h8" />
+          </svg>
+          <h3>DEEP SPACE DATA</h3>
+          <p>Gathering critical data on crew exposure to deep-space radiation, testing communication systems at lunar distances, and validating the heat shield at unprecedented re-entry speeds.</p>
+        </div>
+        <div class="overview-card">
+          <svg class="overview-card-icon" viewBox="0 0 32 32">
+            <path d="M16 4l4 8h8l-6 5 2 9-8-5-8 5 2-9-6-5h8z" />
+          </svg>
+          <h3>GATEWAY TO ARTEMIS III</h3>
+          <p>This test flight paves the way for the first crewed lunar landing since 1972. Every system validated here is needed to return humans to the Moon's surface.</p>
+        </div>
+      </div>
+      <div class="stats-row fade-in">
+        <div class="stat-item">
+          <div class="stat-value">~10</div>
+          <div class="stat-label">Days in Space</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">250K</div>
+          <div class="stat-label">Miles from Earth</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">25,000</div>
+          <div class="stat-label">MPH Re-entry</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">4</div>
+          <div class="stat-label">Crew Members</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Crew -->
+  <section id="crew">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">02 / The Astronauts</div>
+        <h2 class="section-title">MEET THE CREW</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="crew-grid">
+        <a href="https://en.wikipedia.org/wiki/Reid_Wiseman" target="_blank" rel="noopener" class="crew-card fade-in">
+          <div class="crew-img-wrap">
+            <img class="crew-img" src="images/wiseman.jpg" alt="Reid Wiseman">
+            <div class="crew-img-gradient"></div>
+            <div class="crew-flag-label">USA</div>
+          </div>
+          <div class="crew-info">
+            <div class="crew-role">Commander</div>
+            <div class="crew-name">REID WISEMAN</div>
+            <p class="crew-bio">Former Navy test pilot and NASA Chief Astronaut. ISS Expedition 40/41 veteran with 165 days in space. Leads the crew and holds final decision-making authority.</p>
+          </div>
+        </a>
+        <a href="https://en.wikipedia.org/wiki/Victor_J._Glover" target="_blank" rel="noopener" class="crew-card fade-in fade-in-delay-1">
+          <div class="crew-img-wrap">
+            <img class="crew-img" src="images/glover.jpg" alt="Victor Glover">
+            <div class="crew-img-gradient"></div>
+            <div class="crew-flag-label">USA</div>
+          </div>
+          <div class="crew-info">
+            <div class="crew-role">Pilot</div>
+            <div class="crew-name">VICTOR GLOVER</div>
+            <p class="crew-bio">Navy test pilot and SpaceX Crew-1 pilot. 168 days on ISS with four spacewalks. Responsible for spacecraft systems and piloting operations.</p>
+            <span class="crew-milestone">First person of color beyond LEO</span>
+          </div>
+        </a>
+        <a href="https://en.wikipedia.org/wiki/Christina_Koch" target="_blank" rel="noopener" class="crew-card fade-in fade-in-delay-2">
+          <div class="crew-img-wrap">
+            <img class="crew-img" src="images/koch.jpg" alt="Christina Koch">
+            <div class="crew-img-gradient"></div>
+            <div class="crew-flag-label">USA</div>
+          </div>
+          <div class="crew-info">
+            <div class="crew-role">Mission Specialist</div>
+            <div class="crew-name">CHRISTINA KOCH</div>
+            <p class="crew-bio">Holds the record for longest single spaceflight by a woman at 328 consecutive days. Participated in the first all-female spacewalk in 2019.</p>
+            <span class="crew-milestone">First woman beyond LEO</span>
+          </div>
+        </a>
+        <a href="https://en.wikipedia.org/wiki/Jeremy_Hansen" target="_blank" rel="noopener" class="crew-card fade-in fade-in-delay-3">
+          <div class="crew-img-wrap">
+            <img class="crew-img" src="images/hansen.jpg" alt="Jeremy Hansen">
+            <div class="crew-img-gradient"></div>
+            <div class="crew-flag-label">CAN</div>
+          </div>
+          <div class="crew-info">
+            <div class="crew-role">Mission Specialist</div>
+            <div class="crew-name">JEREMY HANSEN</div>
+            <p class="crew-bio">Colonel in the Canadian Armed Forces and former CF-18 fighter pilot. First Canadian to lead a NASA astronaut class. This will be his first spaceflight.</p>
+            <span class="crew-milestone">First non-American beyond LEO</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vehicles -->
+  <section id="vehicles">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">03 / The Hardware</div>
+        <h2 class="section-title">VEHICLES</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="vehicles-grid">
+        <a href="https://en.wikipedia.org/wiki/Space_Launch_System" target="_blank" rel="noopener" class="vehicle-card fade-in">
+          <div class="vehicle-img-wrap">
+            <img class="vehicle-img" src="images/sls-launch.jpg" alt="SLS Rocket Launch">
+          </div>
+          <div class="vehicle-content">
+            <div class="vehicle-name">SLS ROCKET</div>
+            <div class="vehicle-sub">Space Launch System &mdash; Block 1</div>
+            <div class="vehicle-specs">
+              <div class="spec-item">
+                <div class="spec-label">Height</div>
+                <div class="spec-value">322 ft</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Thrust</div>
+                <div class="spec-value">8.8M lbs</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Launch Mass</div>
+                <div class="spec-value">5.75M lbs</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Core Engines</div>
+                <div class="spec-value">4x RS-25</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Boosters</div>
+                <div class="spec-value">2x 5-Seg SRB</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Upper Stage</div>
+                <div class="spec-value">ICPS / RL10</div>
+              </div>
+            </div>
+          </div>
+        </a>
+        <a href="https://en.wikipedia.org/wiki/Orion_(spacecraft)" target="_blank" rel="noopener" class="vehicle-card fade-in fade-in-delay-1">
+          <div class="vehicle-img-wrap">
+            <img class="vehicle-img" src="images/orion.jpg" alt="Orion Spacecraft">
+          </div>
+          <div class="vehicle-content">
+            <div class="vehicle-name">ORION</div>
+            <div class="vehicle-sub">Crew Module + European Service Module</div>
+            <div class="vehicle-specs">
+              <div class="spec-item">
+                <div class="spec-label">Crew</div>
+                <div class="spec-value">4</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Diameter</div>
+                <div class="spec-value">16.5 ft</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Heat Shield</div>
+                <div class="spec-value">5,000 F</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Engines</div>
+                <div class="spec-value">33 Total</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Crew Module</div>
+                <div class="spec-value">Lockheed</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Service Module</div>
+                <div class="spec-value">ESA / Airbus</div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section id="timeline">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">04 / Day by Day</div>
+        <h2 class="section-title">MISSION TIMELINE</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <div class="timeline-day">Day 1 &mdash; April 1</div>
+          <div class="timeline-title">Launch & Earth Orbit</div>
+          <div class="timeline-desc">SLS launches from Kennedy Space Center Pad 39B at <strong>6:24 PM ET</strong>. After booster and core stage separation, Orion enters a high elliptical Earth orbit and performs proximity operations with the spent ICPS upper stage.</div>
+        </div>
+        <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <div class="timeline-day">Day 2</div>
+          <div class="timeline-title">Trans-Lunar Injection</div>
+          <div class="timeline-desc">A critical <strong>6-minute TLI burn</strong> using the European Service Module engine boosts velocity by ~900 mph, placing Orion on a free-return trajectory toward the Moon.</div>
+        </div>
+        <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <div class="timeline-day">Days 3 &ndash; 5</div>
+          <div class="timeline-title">Outbound Coast</div>
+          <div class="timeline-desc">Four-day coast toward the Moon. The crew monitors all systems, gathers data on the deep-space radiation environment, and performs minor trajectory correction burns as needed.</div>
+        </div>
+        <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <div class="timeline-day">Day 6</div>
+          <div class="timeline-title">Lunar Flyby</div>
+          <div class="timeline-desc">Orion passes within <strong>~4,600 miles</strong> of the lunar surface, reaching approximately 250,000 miles from Earth. A <strong>30&ndash;50 minute radio blackout</strong> occurs behind the Moon's far side before lunar gravity slingshots the craft back toward Earth.</div>
+        </div>
+        <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <div class="timeline-day">Days 7 &ndash; 9</div>
+          <div class="timeline-title">Return Journey</div>
+          <div class="timeline-desc">Orion accelerates toward Earth under gravity. Three course-correction burns fine-tune the re-entry angle to ensure a precise and safe atmospheric entry.</div>
+        </div>
+        <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <div class="timeline-day">Day 10 &mdash; ~April 10</div>
+          <div class="timeline-title">Re-entry & Splashdown</div>
+          <div class="timeline-desc">The fastest crewed re-entry in history at <strong>25,000 mph</strong>. Orion uses a skip-entry technique to reduce G-forces, deploys parachutes, and <strong>splashes down in the Pacific Ocean</strong>. Navy and NASA recovery teams retrieve the crew.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Records -->
+  <section id="records">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">05 / Making History</div>
+        <h2 class="section-title">RECORDS & FIRSTS</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="records-grid fade-in">
+        <div class="record-card">
+          <div class="record-number">01</div>
+          <h3>54 YEARS IN THE MAKING</h3>
+          <p>First crewed mission beyond low Earth orbit since Apollo 17 in December 1972.</p>
+        </div>
+        <div class="record-card">
+          <div class="record-number">02</div>
+          <h3>FIRST WOMAN</h3>
+          <p>Christina Koch becomes the first woman to travel beyond low Earth orbit.</p>
+        </div>
+        <div class="record-card">
+          <div class="record-number">03</div>
+          <h3>FIRST PERSON OF COLOR</h3>
+          <p>Victor Glover becomes the first person of color to venture beyond low Earth orbit.</p>
+        </div>
+        <div class="record-card">
+          <div class="record-number">04</div>
+          <h3>FIRST NON-AMERICAN</h3>
+          <p>Jeremy Hansen becomes the first non-U.S. citizen and first Canadian to fly beyond low Earth orbit.</p>
+        </div>
+        <div class="record-card">
+          <div class="record-number">05</div>
+          <h3>FASTEST CREWED RE-ENTRY</h3>
+          <p>At ~25,000 mph, Orion surpasses the Apollo 10 record for fastest crewed atmospheric entry.</p>
+        </div>
+        <div class="record-card">
+          <div class="record-number">06</div>
+          <h3>NEW DISTANCE RECORD</h3>
+          <p>Expected to surpass Apollo 13's record of 248,655 miles — the farthest humans have traveled from Earth.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Facts -->
+  <section id="facts">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-tag">06 / By the Numbers</div>
+        <h2 class="section-title">KEY FACTS</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="facts-grid fade-in">
+        <div class="fact-card">
+          <div class="fact-value">1.3M mi</div>
+          <div class="fact-label">Total Distance</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-value">250K mi</div>
+          <div class="fact-label">Max Distance from Earth</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-value">Mach 32</div>
+          <div class="fact-label">Re-entry Speed</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-value">5,000 F</div>
+          <div class="fact-label">Heat Shield Temp</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-value">8.8M lbs</div>
+          <div class="fact-label">Liftoff Thrust</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-value">322 ft</div>
+          <div class="fact-label">Rocket Height</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-value">6m 5s</div>
+          <div class="fact-label">TLI Burn Duration</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-value">~50 min</div>
+          <div class="fact-label">Radio Blackout</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <div class="footer-logo">ARTEMIS II</div>
+        <div class="footer-text">
+          Images courtesy of <a href="https://www.nasa.gov" target="_blank" rel="noopener">NASA</a> &mdash; Public Domain<br>
+          Not an official NASA website
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="https://www.nasa.gov/mission/artemis-ii/" target="_blank" rel="noopener">NASA Mission Page</a>
+        <a href="https://en.wikipedia.org/wiki/Artemis_II" target="_blank" rel="noopener">Wikipedia</a>
+        <a href="https://www.nasa.gov/humans-in-space/artemis-ii/" target="_blank" rel="noopener">Meet the Crew</a>
+        <a href="https://www.nasa.gov/reference/space-launch-system/" target="_blank" rel="noopener">SLS Reference</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ========== CANVAS STAR FIELD ==========
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let shootingStars = [];
+
+    function initCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = [];
+      const count = Math.floor((canvas.width * canvas.height) / 3000);
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.2 + 0.2,
+          alpha: Math.random() * 0.6 + 0.2,
+          drift: Math.random() * 0.15 + 0.02,
+          twinkleSpeed: Math.random() * 0.008 + 0.002,
+          twinkleOffset: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+
+    function spawnShootingStar() {
+      if (shootingStars.length > 1) return;
+      if (Math.random() > 0.003) return;
+      shootingStars.push({
+        x: Math.random() * canvas.width * 0.8,
+        y: Math.random() * canvas.height * 0.4,
+        len: Math.random() * 80 + 40,
+        speed: Math.random() * 6 + 4,
+        alpha: 1,
+        angle: Math.PI / 5 + Math.random() * 0.3,
+      });
+    }
+
+    function drawStars(time) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const s of stars) {
+        const twinkle = Math.sin(time * s.twinkleSpeed + s.twinkleOffset) * 0.3 + 0.7;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220,225,240,${s.alpha * twinkle})`;
+        ctx.fill();
+        s.y += s.drift;
+        if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
+      }
+
+      spawnShootingStar();
+
+      for (let i = shootingStars.length - 1; i >= 0; i--) {
+        const ss = shootingStars[i];
+        const tailX = ss.x - Math.cos(ss.angle) * ss.len;
+        const tailY = ss.y - Math.sin(ss.angle) * ss.len;
+        const grad = ctx.createLinearGradient(ss.x, ss.y, tailX, tailY);
+        grad.addColorStop(0, `rgba(255,255,255,${ss.alpha})`);
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(ss.x, ss.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ss.x += Math.cos(ss.angle) * ss.speed;
+        ss.y += Math.sin(ss.angle) * ss.speed;
+        ss.alpha -= 0.012;
+        if (ss.alpha <= 0 || ss.x > canvas.width + 100 || ss.y > canvas.height + 100) {
+          shootingStars.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(drawStars);
+    }
+
+    initCanvas();
+    requestAnimationFrame(drawStars);
+    window.addEventListener('resize', initCanvas);
+
+    // ========== COUNTDOWN ==========
+    const LAUNCH = new Date('2026-04-01T22:24:00Z'); // 6:24 PM EDT
+
+    function updateCountdown() {
+      const diff = LAUNCH - new Date();
+      const el = document.getElementById('countdown');
+
+      if (diff <= 0) {
+        el.innerHTML = '<div class="countdown-post-launch">LAUNCHED</div>';
+        return;
+      }
+
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+
+      el.innerHTML = `
+        <div class="countdown-block">
+          <span class="countdown-value">${String(d).padStart(2,'0')}</span>
+          <span class="countdown-unit">Days</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-block">
+          <span class="countdown-value">${String(h).padStart(2,'0')}</span>
+          <span class="countdown-unit">Hours</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-block">
+          <span class="countdown-value">${String(m).padStart(2,'0')}</span>
+          <span class="countdown-unit">Minutes</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-block">
+          <span class="countdown-value">${String(s).padStart(2,'0')}</span>
+          <span class="countdown-unit">Seconds</span>
+        </div>`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // ========== SCROLL ANIMATIONS ==========
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ========== NAV ==========
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    });
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+    document.querySelectorAll('#navLinks a').forEach(a => {
+      a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+    });
+  </script>
+</body>
+</html>
