@@ -978,6 +978,100 @@
     }
     .footer-links a:hover { color: rgba(255,255,255,0.5); }
 
+    /* ========== LAUNCH SEQUENCE ========== */
+    #launch-sequence {
+      background: linear-gradient(180deg, transparent, rgba(5,5,15,0.8), transparent);
+      padding: 6rem 2rem;
+    }
+    .launch-vis {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    #launchCanvas {
+      width: 100%;
+      height: 600px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.04);
+      background: rgba(0,0,0,0.3);
+      display: block;
+    }
+    .launch-controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    .launch-event-btn {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .launch-event-btn:hover {
+      border-color: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.6);
+    }
+    .launch-event-btn.active {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+    .launch-info {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .launch-info-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+    .launch-info-desc {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.35);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ========== TRAJECTORY TELEMETRY ========== */
+    .trajectory-telemetry {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      margin-top: 1.5rem;
+      padding: 1rem 1.5rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 8px;
+    }
+    .telemetry-item { text-align: center; }
+    .telemetry-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .telemetry-label {
+      font-size: 0.5rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      margin-top: 0.4rem;
+    }
+
     /* ========== RESPONSIVE ========== */
     @media (max-width: 1024px) {
       .overview-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1013,6 +1107,10 @@
       .comparison-table th, .comparison-table td { padding: 0.8rem 0.75rem; font-size: 0.8rem; }
       #trajectoryCanvas { height: 400px; }
       .trajectory-stage-btn { padding: 0.4rem 0.6rem; font-size: 0.5rem; }
+      #launchCanvas { height: 400px; }
+      .launch-event-btn { padding: 0.4rem 0.6rem; font-size: 0.5rem; }
+      .trajectory-telemetry { gap: 1rem; flex-wrap: wrap; }
+      .telemetry-value { font-size: 0.75rem; }
       .footer-inner { flex-direction: column; gap: 1.5rem; text-align: center; align-items: center; }
       .footer-links { align-items: center; }
       .hero-moon { width: 300px; height: 300px; }
@@ -1034,6 +1132,7 @@
       <a href="https://www.nasa.gov/mission/artemis-ii/" target="_blank" rel="noopener" class="nav-logo">ARTEMIS II</a>
       <ul class="nav-links" id="navLinks">
         <li><a href="#overview">Mission</a></li>
+        <li><a href="#launch-sequence">Launch</a></li>
         <li><a href="#trajectory">Trajectory</a></li>
         <li><a href="#crew">Crew</a></li>
         <li><a href="#vehicles">Vehicles</a></li>
@@ -1134,6 +1233,23 @@
     </div>
   </section>
 
+  <!-- Launch Sequence -->
+  <section id="launch-sequence">
+    <div class="launch-vis">
+      <div class="section-header fade-in" style="text-align:center;">
+        <div class="section-tag">Ascent Profile</div>
+        <h2 class="section-title">LAUNCH SEQUENCE</h2>
+        <div class="section-line" style="margin:1.5rem auto 0;"></div>
+      </div>
+      <canvas id="launchCanvas"></canvas>
+      <div class="launch-controls" id="launchControls"></div>
+      <div class="launch-info">
+        <div class="launch-info-title" id="launchTitle">PRE-LAUNCH</div>
+        <div class="launch-info-desc" id="launchDesc">SLS stands on Pad 39B. 725,000 gallons of cryogenic propellant loaded.</div>
+      </div>
+    </div>
+  </section>
+
   <!-- Trajectory Visualization -->
   <section id="trajectory">
     <div class="trajectory-container">
@@ -1147,6 +1263,24 @@
       <div class="trajectory-info">
         <div class="trajectory-info-title" id="trajTitle">PRE-LAUNCH</div>
         <div class="trajectory-info-desc" id="trajDesc">Awaiting liftoff from Kennedy Space Center, Pad 39B.</div>
+      </div>
+      <div class="trajectory-telemetry" id="trajTelemetry">
+        <div class="telemetry-item">
+          <div class="telemetry-value">T-00:10:00</div>
+          <div class="telemetry-label">Mission Time</div>
+        </div>
+        <div class="telemetry-item">
+          <div class="telemetry-value">0 ft</div>
+          <div class="telemetry-label">Altitude</div>
+        </div>
+        <div class="telemetry-item">
+          <div class="telemetry-value">0 mph</div>
+          <div class="telemetry-label">Velocity</div>
+        </div>
+        <div class="telemetry-item">
+          <div class="telemetry-value">0 mi</div>
+          <div class="telemetry-label">Distance</div>
+        </div>
       </div>
     </div>
   </section>
@@ -1784,40 +1918,484 @@
       });
     });
   </script>
+  <!-- Launch Sequence Canvas Animation -->
+  <script>
+  (function() {
+    const cvs = document.getElementById('launchCanvas');
+    if (!cvs) return;
+    const c = cvs.getContext('2d');
+
+    const events = [
+      { t: 0.00, name: 'PRE-LAUNCH', desc: 'SLS stands on Pad 39B. 725,000 gallons of cryogenic propellant loaded. Automated launch sequencer active.', alt: 0, speed: 0, tLabel: 'T-00:10', hasSRBs: true, hasFairings: true, hasLAS: true, hasCore: true, burning: false },
+      { t: 0.08, name: 'RS-25 IGNITION', desc: 'Four RS-25 engines ignite sequentially, 7 seconds before liftoff. Each produces 512,000 lbs of thrust. Steam billows from the pad.', alt: 0, speed: 0, tLabel: 'T-00:07', hasSRBs: true, hasFairings: true, hasLAS: true, hasCore: true, burning: true },
+      { t: 0.15, name: 'LIFTOFF', desc: 'SRBs ignite! SLS rises on 8.8 million lbs of thrust -- 15% more than Saturn V. Tower cleared in 6.5 seconds.', alt: 300, speed: 100, tLabel: 'T+00:00', hasSRBs: true, hasFairings: true, hasLAS: true, hasCore: true, burning: true },
+      { t: 0.28, name: 'SUPERSONIC / MAX Q', desc: 'Passes Mach 1 at T+56s. Maximum aerodynamic pressure at T+70s -- the most stressful moment of ascent.', alt: 30000, speed: 1100, tLabel: 'T+01:10', hasSRBs: true, hasFairings: true, hasLAS: true, hasCore: true, burning: true },
+      { t: 0.45, name: 'SRB SEPARATION', desc: 'Boosters exhausted after 2 min 8 sec. Explosive bolts fire, separation motors push 1.6M-lb SRBs clear at 30 miles altitude.', alt: 158000, speed: 3170, tLabel: 'T+02:08', hasSRBs: false, hasFairings: true, hasLAS: true, hasCore: true, burning: true, separation: 'srb' },
+      { t: 0.60, name: 'FAIRING & LAS JETTISON', desc: 'Three service module panels jettison, exposing ESM solar arrays. Launch Abort System fires away -- no longer needed above the atmosphere.', alt: 260000, speed: 8500, tLabel: 'T+03:18', hasSRBs: false, hasFairings: false, hasLAS: false, hasCore: true, burning: true, separation: 'fairing' },
+      { t: 0.78, name: 'MECO', desc: 'Main Engine Cut-Off. Four RS-25 engines shut down after 8 min 6 sec of powered flight. Altitude: 100 miles. Speed: 17,430 mph.', alt: 531000, speed: 17430, tLabel: 'T+08:06', hasSRBs: false, hasFairings: false, hasLAS: false, hasCore: true, burning: false },
+      { t: 0.88, name: 'CORE STAGE SEP', desc: 'The massive 188,000-lb core stage separates and tumbles toward the Atlantic. ICPS upper stage is now in control.', alt: 540000, speed: 17430, tLabel: 'T+08:18', hasSRBs: false, hasFairings: false, hasLAS: false, hasCore: false, burning: false, separation: 'core' },
+      { t: 1.00, name: 'ORBITAL INSERTION', desc: 'ICPS RL10 engine fires for perigee raise maneuver. Orion achieves a stable 1,381 x 115 mile orbit around Earth.', alt: 607200, speed: 17500, tLabel: 'T+00:49', hasSRBs: false, hasFairings: false, hasLAS: false, hasCore: false, burning: true },
+    ];
+
+    let curIdx = 0, progress = 0, targetProgress = 0;
+    let autoPlay = true, autoTimer = 0;
+    let flames = [], debris = [];
+    let isVisible = false;
+    let lastSepIdx = -1;
+
+    // roundRect polyfill for older browsers
+    if (!c.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        r = Math.min(r, w/2, h/2);
+        this.moveTo(x+r, y);
+        this.arcTo(x+w, y, x+w, y+h, r);
+        this.arcTo(x+w, y+h, x, y+h, r);
+        this.arcTo(x, y+h, x, y, r);
+        this.arcTo(x, y, x+w, y, r);
+        this.closePath();
+      };
+    }
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      cvs.width = cvs.clientWidth * dpr;
+      cvs.height = cvs.clientHeight * dpr;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Build buttons
+    const controlsEl = document.getElementById('launchControls');
+    const titleEl = document.getElementById('launchTitle');
+    const descEl = document.getElementById('launchDesc');
+
+    events.forEach((ev, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'launch-event-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = ev.name;
+      btn.addEventListener('click', () => {
+        targetProgress = ev.t;
+        curIdx = i;
+        autoPlay = false;
+        lastSepIdx = -1;
+        updateUI();
+      });
+      controlsEl.appendChild(btn);
+    });
+
+    function updateUI() {
+      controlsEl.querySelectorAll('.launch-event-btn').forEach((b, i) => b.classList.toggle('active', i === curIdx));
+      titleEl.textContent = events[curIdx].name;
+      descEl.textContent = events[curIdx].desc;
+    }
+
+    function spawnFlame(x, y, count) {
+      for (let i = 0; i < count; i++) {
+        flames.push({
+          x: x + (Math.random() - 0.5) * 18,
+          y: y + Math.random() * 5,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: Math.random() * 4 + 2,
+          life: 1, size: Math.random() * 5 + 2,
+          hue: Math.random() > 0.3 ? 30 : 15,
+        });
+      }
+    }
+
+    function spawnDebris(x, y, type) {
+      const count = type === 'srb' ? 30 : type === 'core' ? 25 : 20;
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 4 + 1;
+        debris.push({
+          x, y: y + (Math.random() - 0.5) * 30,
+          vx: Math.cos(angle) * spd * (type === 'srb' ? 2 : 1),
+          vy: Math.sin(angle) * spd + (type === 'core' ? 2 : 0),
+          life: 1, size: Math.random() * 3 + 1,
+        });
+      }
+    }
+
+    function drawRocket(cx, cy, sc, ev) {
+      c.save();
+      c.translate(cx, cy);
+      c.scale(sc, sc);
+
+      // Core stage
+      if (ev.hasCore) {
+        const coreGrad = c.createLinearGradient(-12, -40, 12, -40);
+        coreGrad.addColorStop(0, '#b85518');
+        coreGrad.addColorStop(0.5, '#d4721e');
+        coreGrad.addColorStop(1, '#a04a15');
+        c.fillStyle = coreGrad;
+        c.beginPath();
+        c.roundRect(-12, -40, 24, 80, 2);
+        c.fill();
+
+        // RS-25 nozzle cluster
+        c.fillStyle = '#444';
+        [-5, 0, 5].forEach(x => {
+          c.beginPath();
+          c.moveTo(x - 3, 40);
+          c.lineTo(x - 4, 48);
+          c.lineTo(x + 4, 48);
+          c.lineTo(x + 3, 40);
+          c.fill();
+        });
+        // Intertank
+        c.fillStyle = 'rgba(0,0,0,0.15)';
+        c.fillRect(-12, -5, 24, 6);
+      }
+
+      // ICPS upper stage
+      const icpsGrad = c.createLinearGradient(-10, -70, 10, -70);
+      icpsGrad.addColorStop(0, '#ccc');
+      icpsGrad.addColorStop(0.5, '#eee');
+      icpsGrad.addColorStop(1, '#bbb');
+      c.fillStyle = icpsGrad;
+      c.beginPath();
+      c.roundRect(-10, -68, 20, 28, 2);
+      c.fill();
+
+      // Fairings
+      if (ev.hasFairings) {
+        c.fillStyle = 'rgba(180,180,180,0.4)';
+        c.fillRect(-14, -68, 3, 28);
+        c.fillRect(11, -68, 3, 28);
+      }
+
+      // Orion capsule
+      const orionGrad = c.createLinearGradient(0, -92, 0, -68);
+      orionGrad.addColorStop(0, '#fff');
+      orionGrad.addColorStop(1, '#ccd');
+      c.fillStyle = orionGrad;
+      c.beginPath();
+      c.moveTo(0, -92);
+      c.lineTo(-10, -68);
+      c.lineTo(10, -68);
+      c.closePath();
+      c.fill();
+
+      // LAS tower
+      if (ev.hasLAS) {
+        c.strokeStyle = '#777';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.moveTo(0, -92);
+        c.lineTo(0, -112);
+        c.stroke();
+        c.fillStyle = '#666';
+        c.beginPath();
+        c.moveTo(0, -118);
+        c.lineTo(-5, -108);
+        c.lineTo(5, -108);
+        c.closePath();
+        c.fill();
+      }
+
+      // SRBs
+      if (ev.hasSRBs) {
+        [-1, 1].forEach(side => {
+          const sx = side * 22;
+          c.fillStyle = '#888';
+          c.beginPath();
+          c.roundRect(sx - 6, -28, 12, 68, 2);
+          c.fill();
+          // SRB nose cone
+          c.beginPath();
+          c.moveTo(sx, -36);
+          c.lineTo(sx - 6, -28);
+          c.lineTo(sx + 6, -28);
+          c.closePath();
+          c.fill();
+          // SRB nozzle
+          c.fillStyle = '#555';
+          c.beginPath();
+          c.moveTo(sx - 4, 40);
+          c.lineTo(sx - 5, 46);
+          c.lineTo(sx + 5, 46);
+          c.lineTo(sx + 4, 40);
+          c.fill();
+        });
+      }
+
+      c.restore();
+    }
+
+    function draw(time) {
+      if (!isVisible) return;
+      requestAnimationFrame(draw);
+
+      const w = cvs.width, h = cvs.height;
+      const dpr = w / cvs.clientWidth;
+
+      // Auto-play
+      if (autoPlay) {
+        autoTimer += 0.0012;
+        const cyc = events.length * 5;
+        const ct = (autoTimer % cyc) / cyc;
+        let idx = 0;
+        for (let i = events.length - 1; i >= 0; i--) {
+          if (ct >= events[i].t / 1.05) { idx = i; break; }
+        }
+        targetProgress = events[idx].t;
+        if (idx !== curIdx) { curIdx = idx; updateUI(); }
+      }
+
+      progress += (targetProgress - progress) * 0.025;
+
+      // Background: atmosphere to space gradient
+      const skyFrac = Math.min(progress * 1.8, 1);
+      const grad = c.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#030308');
+      grad.addColorStop(0.4, `rgb(${5 + 5 * (1-skyFrac)},${8 + 12 * (1-skyFrac)},${15 + 35 * (1-skyFrac)})`);
+      grad.addColorStop(1, `rgba(${15 + 50 * (1-skyFrac)},${25 + 50 * (1-skyFrac)},${50 + 80 * (1-skyFrac)},1)`);
+      c.fillStyle = grad;
+      c.fillRect(0, 0, w, h);
+
+      // Stars (visible as atmosphere fades)
+      if (skyFrac > 0.3) {
+        const starAlpha = (skyFrac - 0.3) * 0.8;
+        c.fillStyle = `rgba(255,255,255,${starAlpha * 0.4})`;
+        for (let i = 0; i < 80; i++) {
+          const sx = ((i * 137.508 + 23.7) % w);
+          const sy = ((i * 97.31 + 43.2) % h);
+          const sr = ((i * 31.71 + 7.3) % 3) * 0.5 + 0.3;
+          c.beginPath();
+          c.arc(sx, sy, sr * dpr, 0, Math.PI * 2);
+          c.fill();
+        }
+      }
+
+      // Ground & launch pad
+      if (progress < 0.25) {
+        const ga = Math.max(0, 1 - progress * 5);
+        c.fillStyle = `rgba(15,20,15,${ga})`;
+        c.fillRect(0, h * 0.82, w, h * 0.18);
+
+        // Launch tower
+        c.strokeStyle = `rgba(90,90,90,${ga})`;
+        c.lineWidth = 4 * dpr;
+        const towerX = w * 0.5 - 55 * dpr;
+        c.beginPath();
+        c.moveTo(towerX, h * 0.82);
+        c.lineTo(towerX, h * 0.38);
+        c.stroke();
+
+        // Tower structure
+        c.lineWidth = 1.5 * dpr;
+        c.strokeStyle = `rgba(70,70,70,${ga})`;
+        for (let y = h * 0.42; y < h * 0.82; y += 25 * dpr) {
+          c.beginPath();
+          c.moveTo(towerX - 8 * dpr, y);
+          c.lineTo(towerX + 8 * dpr, y);
+          c.stroke();
+        }
+
+        // Crew access arm
+        c.strokeStyle = `rgba(100,100,100,${ga})`;
+        c.lineWidth = 3 * dpr;
+        c.beginPath();
+        c.moveTo(towerX, h * 0.48);
+        c.lineTo(towerX + 40 * dpr, h * 0.48);
+        c.stroke();
+
+        // Pad flame trench
+        const trenchGrad = c.createLinearGradient(w * 0.5 - 40 * dpr, h * 0.82, w * 0.5 + 40 * dpr, h * 0.82);
+        trenchGrad.addColorStop(0, `rgba(30,30,30,${ga})`);
+        trenchGrad.addColorStop(0.5, `rgba(50,50,50,${ga})`);
+        trenchGrad.addColorStop(1, `rgba(30,30,30,${ga})`);
+        c.fillStyle = trenchGrad;
+        c.fillRect(w * 0.5 - 40 * dpr, h * 0.82, 80 * dpr, 10 * dpr);
+      }
+
+      // Rocket
+      const ev = events[curIdx];
+      const rocketX = w * 0.5;
+      const baseY = h * 0.72;
+      const rocketY = baseY - progress * h * 0.25;
+      const sc = dpr * (1.3 - progress * 0.25);
+      drawRocket(rocketX, rocketY, sc, ev);
+
+      // Flame particles
+      if (ev.burning && Math.abs(progress - targetProgress) < 0.15) {
+        const nozzleY = rocketY + (ev.hasCore ? 48 : (ev.hasSRBs ? 46 : 10)) * sc;
+        spawnFlame(rocketX, nozzleY, ev.hasSRBs ? 6 : 3);
+        if (ev.hasSRBs) {
+          spawnFlame(rocketX - 22 * sc, nozzleY, 3);
+          spawnFlame(rocketX + 22 * sc, nozzleY, 3);
+        }
+      }
+
+      // Separation effects
+      if (ev.separation && curIdx !== lastSepIdx && Math.abs(progress - targetProgress) < 0.05) {
+        spawnDebris(rocketX, rocketY, ev.separation);
+        lastSepIdx = curIdx;
+      }
+
+      // Draw & update flames
+      for (let i = flames.length - 1; i >= 0; i--) {
+        const f = flames[i];
+        f.x += f.vx;
+        f.y += f.vy;
+        f.life -= 0.025;
+        f.size *= 0.97;
+        if (f.life <= 0) { flames.splice(i, 1); continue; }
+        c.globalAlpha = f.life * 0.7;
+        c.fillStyle = `hsl(${f.hue}, 100%, ${50 + f.life * 30}%)`;
+        c.beginPath();
+        c.arc(f.x, f.y, f.size * dpr, 0, Math.PI * 2);
+        c.fill();
+      }
+
+      // Draw & update debris
+      for (let i = debris.length - 1; i >= 0; i--) {
+        const d = debris[i];
+        d.x += d.vx; d.y += d.vy;
+        d.vy += 0.05; // gravity
+        d.life -= 0.012;
+        if (d.life <= 0) { debris.splice(i, 1); continue; }
+        c.globalAlpha = d.life * 0.6;
+        c.fillStyle = '#ffaa44';
+        c.beginPath();
+        c.arc(d.x, d.y, d.size * dpr, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.globalAlpha = 1;
+
+      // HUD: Altitude bar (left)
+      const barX = 24 * dpr, barW = 6 * dpr;
+      const barTop = 50 * dpr, barBot = h - 40 * dpr;
+      const barH = barBot - barTop;
+      c.fillStyle = 'rgba(255,255,255,0.04)';
+      c.fillRect(barX, barTop, barW, barH);
+
+      const altFrac = Math.min(ev.alt / 607200, 1);
+      const altBarH = altFrac * barH;
+      if (altBarH > 0) {
+        const aGrad = c.createLinearGradient(0, barBot - altBarH, 0, barBot);
+        aGrad.addColorStop(0, 'rgba(68,136,255,0.7)');
+        aGrad.addColorStop(1, 'rgba(68,136,255,0.1)');
+        c.fillStyle = aGrad;
+        c.fillRect(barX, barBot - altBarH, barW, altBarH);
+      }
+
+      // Altitude text
+      c.fillStyle = 'rgba(255,255,255,0.35)';
+      c.font = `${9 * dpr}px "Space Mono", monospace`;
+      c.textAlign = 'left';
+      const altMi = ev.alt / 5280;
+      const altStr = altMi >= 1 ? `${Math.round(altMi).toLocaleString()} mi` : `${ev.alt.toLocaleString()} ft`;
+      c.fillText(altStr, barX + barW + 6 * dpr, barBot - altBarH + 4 * dpr);
+      c.fillStyle = 'rgba(255,255,255,0.15)';
+      c.font = `${7 * dpr}px "Space Mono", monospace`;
+      c.fillText('ALTITUDE', barX + barW + 6 * dpr, barBot - altBarH + 14 * dpr);
+
+      // Speed (top right)
+      c.textAlign = 'right';
+      c.fillStyle = 'rgba(255,255,255,0.35)';
+      c.font = `bold ${13 * dpr}px "Space Mono", monospace`;
+      c.fillText(`${ev.speed.toLocaleString()} MPH`, w - 20 * dpr, 40 * dpr);
+      c.fillStyle = 'rgba(255,255,255,0.15)';
+      c.font = `${7 * dpr}px "Space Mono", monospace`;
+      c.fillText('VELOCITY', w - 20 * dpr, 52 * dpr);
+
+      // T+ time (top right, below speed)
+      c.fillStyle = 'rgba(255,255,255,0.25)';
+      c.font = `bold ${11 * dpr}px "Space Mono", monospace`;
+      c.fillText(ev.tLabel, w - 20 * dpr, 72 * dpr);
+      c.fillStyle = 'rgba(255,255,255,0.12)';
+      c.font = `${7 * dpr}px "Space Mono", monospace`;
+      c.fillText('MISSION TIME', w - 20 * dpr, 83 * dpr);
+
+      // Mach number
+      if (ev.speed > 700) {
+        const mach = (ev.speed / 767).toFixed(1);
+        c.fillStyle = 'rgba(255,255,255,0.2)';
+        c.font = `bold ${10 * dpr}px "Space Mono", monospace`;
+        c.fillText(`MACH ${mach}`, w - 20 * dpr, 100 * dpr);
+      }
+
+      // Keep particle arrays bounded
+      if (flames.length > 300) flames.splice(0, flames.length - 300);
+      if (debris.length > 100) debris.splice(0, debris.length - 100);
+    }
+
+    // Visibility observer
+    const launchObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !isVisible) {
+          isVisible = true;
+          requestAnimationFrame(draw);
+        }
+        if (!e.isIntersecting) isVisible = false;
+      });
+    }, { threshold: 0.1 });
+    launchObs.observe(document.getElementById('launch-sequence'));
+  })();
+  </script>
+
   <script type="importmap">
     { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js" } }
   </script>
   <script type="module">
     import * as THREE from 'three';
 
-    // ========== MISSION STAGES ==========
+    // ========== EXPANDED MISSION STAGES ==========
     const stages = [
-      { t: 0.0,  name: 'PRE-LAUNCH',      desc: 'Awaiting liftoff from Kennedy Space Center, Pad 39B.' },
-      { t: 0.02, name: 'LIFTOFF',          desc: 'SLS ignites its 4 RS-25 engines and 2 solid rocket boosters. 8.8 million lbs of thrust.' },
-      { t: 0.04, name: 'SRB SEPARATION',   desc: 'Solid rocket boosters burn out and separate 2 minutes after launch at ~100,000 ft.' },
-      { t: 0.07, name: 'CORE STAGE SEP',   desc: 'Core stage engines cut off. ICPS upper stage takes over to reach orbit.' },
-      { t: 0.12, name: 'EARTH ORBIT',      desc: 'Orion enters a high elliptical Earth orbit. Systems checkout and proximity operations with ICPS.' },
-      { t: 0.2,  name: 'TLI BURN',         desc: 'A critical 6-minute burn sends Orion on a free-return trajectory toward the Moon at ~25,000 mph.' },
-      { t: 0.45, name: 'OUTBOUND COAST',   desc: 'Four-day coast through deep space. Crew monitors systems and gathers radiation data.' },
-      { t: 0.55, name: 'LUNAR FLYBY',      desc: 'Orion passes within ~4,600 miles of the Moon. 30-50 minute radio blackout behind the far side.' },
-      { t: 0.75, name: 'RETURN COAST',     desc: 'Lunar gravity slingshots Orion back toward Earth. Three correction burns fine-tune the approach.' },
-      { t: 0.92, name: 'RE-ENTRY',         desc: 'Fastest crewed re-entry ever at 25,000 mph. Skip-entry technique reduces G-forces to ~4g.' },
-      { t: 1.0,  name: 'SPLASHDOWN',       desc: 'Parachutes deploy. Orion splashes down in the Pacific Ocean. Recovery teams retrieve the crew.' },
+      { t: 0.00, name: 'PRE-LAUNCH', desc: 'SLS stands ready on Pad 39B, Kennedy Space Center. 725,000 gallons of cryogenic propellant loaded. Crew sealed inside Orion spacecraft "Integrity".',
+        tPlus: 'T-00:10:00', alt: '0 ft', speed: '0 mph', dist: '0 mi', burn: false,
+        cam: { x: -3, y: 1.5, z: 5 }, look: { x: -4, y: 0, z: 2 } },
+      { t: 0.015, name: 'LIFTOFF', desc: '4 RS-25 engines + 2 solid rocket boosters ignite. 8.8 million lbs of thrust -- 15% more than Saturn V. SLS clears the 380-ft tower in 6.5 seconds.',
+        tPlus: 'T+00:00:06', alt: '300 ft', speed: '100 mph', dist: '0 mi', burn: true,
+        cam: { x: -3, y: 2, z: 5.5 }, look: { x: -4, y: 0.5, z: 2 } },
+      { t: 0.035, name: 'SRB SEPARATION', desc: 'Solid rocket boosters burn out and jettison 2 min 8 sec after launch. Explosive bolts fire at 30 miles altitude. Each booster weighs 1.6 million lbs.',
+        tPlus: 'T+00:02:08', alt: '158,000 ft', speed: '3,170 mph', dist: '30 mi', burn: true, sep: true,
+        cam: { x: -2.8, y: 3, z: 4.5 }, look: { x: -3.5, y: 1.5, z: 2.5 } },
+      { t: 0.06, name: 'CORE STAGE SEP', desc: 'Main Engine Cut-Off (MECO) after 8 min 6 sec. The massive core stage separates -- ICPS upper stage with its single RL10 engine takes over.',
+        tPlus: 'T+00:08:18', alt: '531,000 ft', speed: '17,430 mph', dist: '100 mi', burn: false, sep: true,
+        cam: { x: -1.5, y: 4, z: 5 }, look: { x: -2, y: 2.5, z: 2 } },
+      { t: 0.12, name: 'EARTH ORBIT', desc: 'Two ICPS burns raise orbit to 43,500-mile apogee. Orion separates from ICPS and performs proximity operations -- flying within 10 meters of the spent stage.',
+        tPlus: 'T+03:24:00', alt: '115 mi', speed: '17,430 mph', dist: '43,500 mi', burn: true,
+        cam: { x: 0, y: 7, z: 14 }, look: { x: -2, y: 0, z: 0 } },
+      { t: 0.2, name: 'TLI BURN', desc: 'European Service Module engine fires for 6 min 5 sec -- the point of no return. Velocity increases 900 mph, committing Orion to a free-return lunar trajectory.',
+        tPlus: 'Day 2', alt: '43,500 mi', speed: '24,500 mph', dist: '43,500 mi', burn: true,
+        cam: { x: 2, y: 5, z: 9 }, look: { x: 1, y: 2, z: 0 } },
+      { t: 0.4, name: 'OUTBOUND COAST', desc: 'Four-day coast to the Moon. The crew tests life support, measures deep-space radiation, and performs trajectory corrections. Communications delay grows to 1.3 seconds.',
+        tPlus: 'Day 3-5', alt: '~150,000 mi', speed: '2,500 mph', dist: '150,000 mi', burn: false,
+        cam: { x: 5, y: 3, z: 7 }, look: { x: 6, y: 1, z: -1 } },
+      { t: 0.55, name: 'LUNAR FLYBY', desc: 'Closest approach: ~4,600 miles above the lunar surface. Maximum distance from Earth: ~252,000 miles -- farther than any human in history. 30-50 min radio blackout behind the far side.',
+        tPlus: 'Day 6', alt: '4,600 mi', speed: '5,000 mph', dist: '252,000 mi', burn: false,
+        cam: { x: 9.5, y: 1.5, z: 3 }, look: { x: 10, y: 0.5, z: -1 } },
+      { t: 0.75, name: 'RETURN COAST', desc: 'Lunar gravity slingshots Orion homeward on the free-return trajectory. Three course-correction burns fine-tune the re-entry angle for precise splashdown targeting.',
+        tPlus: 'Day 7-9', alt: '~180,000 mi', speed: '3,000 mph', dist: '180,000 mi', burn: false,
+        cam: { x: 4, y: -1, z: 7 }, look: { x: 2, y: -1, z: 1 } },
+      { t: 0.92, name: 'SKIP RE-ENTRY', desc: 'Fastest crewed re-entry in history: 25,000 mph (Mach 32). Skip-entry technique -- dip into atmosphere, bounce to 325,000 ft, then final descent. Heat shield reaches 5,000\u00b0F.',
+        tPlus: 'Day 10', alt: '400,000 ft', speed: '25,000 mph', dist: '50 mi', burn: false, reentry: true,
+        cam: { x: -3.5, y: 1, z: 5 }, look: { x: -3.5, y: -0.3, z: 2 } },
+      { t: 1.0, name: 'SPLASHDOWN', desc: 'Drogue chutes at 25,000 ft, then three 116-ft main parachutes. Orion hits the Pacific at 17 mph. Navy and NASA recovery teams retrieve the crew within 2 hours.',
+        tPlus: 'Day 10', alt: '0 ft', speed: '17 mph', dist: '0 mi', burn: false,
+        cam: { x: -3, y: 1, z: 4.5 }, look: { x: -3.5, y: -0.3, z: 2.2 } },
     ];
 
     // ========== SCENE SETUP ==========
     const canvasEl = document.getElementById('trajectoryCanvas');
     const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, canvasEl.clientWidth / canvasEl.clientHeight, 0.1, 1000);
-    camera.position.set(0, 8, 18);
-    camera.lookAt(2, 0, 0);
+    camera.position.set(-3, 1.5, 5);
+
+    const camPos = { x: -3, y: 1.5, z: 5 };
+    const camLook = { x: -4, y: 0, z: 2 };
+    const targetCamPos = { x: -3, y: 1.5, z: 5 };
+    const targetCamLook = { x: -4, y: 0, z: 2 };
 
     function resize() {
-      const w = canvasEl.clientWidth;
-      const h = canvasEl.clientHeight;
+      const w = canvasEl.clientWidth, h = canvasEl.clientHeight;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
@@ -1825,39 +2403,75 @@
     resize();
     window.addEventListener('resize', resize);
 
-    // ========== EARTH ==========
-    const earthGeo = new THREE.SphereGeometry(2, 48, 48);
-    const earthMat = new THREE.MeshStandardMaterial({
-      color: 0x1a3a5c,
-      roughness: 0.8,
-      metalness: 0.1,
-      emissive: 0x0a1520,
-      emissiveIntensity: 0.3,
+    // ========== TEXTURE LOADER ==========
+    const loader = new THREE.TextureLoader();
+
+    // ========== EARTH (textured) ==========
+    const earthGeo = new THREE.SphereGeometry(2, 64, 64);
+    const earthMat = new THREE.MeshPhongMaterial({
+      color: 0x1a3a5c, shininess: 25,
+      emissive: 0x0a1520, emissiveIntensity: 0.3,
+    });
+    loader.load('images/earth-texture.jpg', (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      earthMat.map = tex;
+      earthMat.color.set(0xffffff);
+      earthMat.emissive.set(0x111133);
+      earthMat.emissiveIntensity = 0.15;
+      earthMat.needsUpdate = true;
     });
     const earth = new THREE.Mesh(earthGeo, earthMat);
     earth.position.set(-4, 0, 0);
     scene.add(earth);
 
-    // Earth atmosphere glow
-    const glowGeo = new THREE.SphereGeometry(2.15, 48, 48);
-    const glowMat = new THREE.MeshBasicMaterial({
-      color: 0x4488cc,
-      transparent: true,
-      opacity: 0.08,
+    // Earth atmosphere (Fresnel shader)
+    const atmosGeo = new THREE.SphereGeometry(2.2, 64, 64);
+    const atmosMat = new THREE.ShaderMaterial({
+      uniforms: {
+        glowColor: { value: new THREE.Color(0x4488ff) },
+        coeff: { value: 0.7 },
+        power: { value: 3.5 },
+      },
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vPositionNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vPositionNormal = normalize((modelViewMatrix * vec4(position, 1.0)).xyz);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }`,
+      fragmentShader: `
+        uniform vec3 glowColor;
+        uniform float coeff;
+        uniform float power;
+        varying vec3 vNormal;
+        varying vec3 vPositionNormal;
+        void main() {
+          float intensity = pow(coeff - dot(vNormal, vPositionNormal), power);
+          gl_FragColor = vec4(glowColor, intensity * 0.35);
+        }`,
       side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false,
     });
-    const glow = new THREE.Mesh(glowGeo, glowMat);
-    glow.position.copy(earth.position);
-    scene.add(glow);
+    const atmosphere = new THREE.Mesh(atmosGeo, atmosMat);
+    atmosphere.position.copy(earth.position);
+    scene.add(atmosphere);
 
-    // ========== MOON ==========
-    const moonGeo = new THREE.SphereGeometry(0.7, 32, 32);
-    const moonMat = new THREE.MeshStandardMaterial({
-      color: 0x888888,
-      roughness: 1,
-      metalness: 0,
-      emissive: 0x222222,
-      emissiveIntensity: 0.2,
+    // ========== MOON (textured) ==========
+    const moonGeo = new THREE.SphereGeometry(0.7, 48, 48);
+    const moonMat = new THREE.MeshPhongMaterial({
+      color: 0x888888, shininess: 5,
+      emissive: 0x222222, emissiveIntensity: 0.2,
+    });
+    loader.load('images/moon-texture.jpg', (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      moonMat.map = tex;
+      moonMat.color.set(0xffffff);
+      moonMat.emissive.set(0x222222);
+      moonMat.emissiveIntensity = 0.1;
+      moonMat.needsUpdate = true;
     });
     const moon = new THREE.Mesh(moonGeo, moonMat);
     moon.position.set(10, 0.5, -1);
@@ -1866,204 +2480,388 @@
     // Moon glow
     const moonGlowGeo = new THREE.SphereGeometry(0.85, 32, 32);
     const moonGlowMat = new THREE.MeshBasicMaterial({
-      color: 0xaaaaaa,
-      transparent: true,
-      opacity: 0.05,
-      side: THREE.BackSide,
+      color: 0xcccccc, transparent: true, opacity: 0.06, side: THREE.BackSide,
     });
-    const moonGlow = new THREE.Mesh(moonGlowGeo, moonGlowMat);
-    moonGlow.position.copy(moon.position);
-    scene.add(moonGlow);
+    const moonGlowMesh = new THREE.Mesh(moonGlowGeo, moonGlowMat);
+    moonGlowMesh.position.copy(moon.position);
+    scene.add(moonGlowMesh);
 
     // ========== LIGHTS ==========
-    const ambient = new THREE.AmbientLight(0x334466, 0.6);
-    scene.add(ambient);
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    scene.add(new THREE.AmbientLight(0x334466, 0.4));
+    const sunLight = new THREE.DirectionalLight(0xffeedd, 2.0);
     sunLight.position.set(-15, 8, 10);
     scene.add(sunLight);
-    const rimLight = new THREE.DirectionalLight(0x4466aa, 0.4);
+    const rimLight = new THREE.DirectionalLight(0x4466aa, 0.3);
     rimLight.position.set(10, -5, -5);
     scene.add(rimLight);
+    const fillLight = new THREE.PointLight(0x3355aa, 0.5, 50);
+    fillLight.position.set(0, 5, 5);
+    scene.add(fillLight);
 
     // ========== TRAJECTORY CURVE ==========
     const curvePoints = [
-      new THREE.Vector3(-4, 0, 2.1),       // Launch from Earth surface
-      new THREE.Vector3(-3, 1.5, 3),        // Ascent
-      new THREE.Vector3(-1, 2.5, 2),        // Earth orbit
-      new THREE.Vector3(2, 3, 0.5),         // TLI / outbound
-      new THREE.Vector3(6, 2, -0.5),        // Coast
-      new THREE.Vector3(9.5, 1, -1.2),      // Near Moon
-      new THREE.Vector3(11, 0.5, -2),       // Behind Moon (flyby)
-      new THREE.Vector3(10, -0.5, -0.5),    // Swing back
-      new THREE.Vector3(6, -1.5, 1),        // Return coast
-      new THREE.Vector3(2, -2, 2),          // Approach Earth
-      new THREE.Vector3(-2, -1, 2.5),       // Re-entry
-      new THREE.Vector3(-3.5, -0.3, 2.2),   // Splashdown near Earth
+      new THREE.Vector3(-4, 0, 2.1),
+      new THREE.Vector3(-3.8, 0.8, 2.5),
+      new THREE.Vector3(-3, 1.5, 3),
+      new THREE.Vector3(-1, 2.5, 2),
+      new THREE.Vector3(2, 3, 0.5),
+      new THREE.Vector3(6, 2, -0.5),
+      new THREE.Vector3(9.5, 1, -1.2),
+      new THREE.Vector3(11, 0.5, -2),
+      new THREE.Vector3(10, -0.5, -0.5),
+      new THREE.Vector3(6, -1.5, 1),
+      new THREE.Vector3(2, -2, 2),
+      new THREE.Vector3(-2, -1, 2.5),
+      new THREE.Vector3(-3.5, -0.3, 2.2),
     ];
     const curve = new THREE.CatmullRomCurve3(curvePoints);
 
-    // Full trajectory line (dim)
-    const fullLineGeo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(200));
-    const fullLineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.06 });
-    const fullLine = new THREE.Line(fullLineGeo, fullLineMat);
-    scene.add(fullLine);
+    // Full trajectory (dim)
+    const fullLineGeo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(300));
+    scene.add(new THREE.Line(fullLineGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.06 })));
 
-    // Active trajectory line (bright, partial)
-    const activePoints = 200;
-    const activePositions = new Float32Array(activePoints * 3);
-    const activeGeo = new THREE.BufferGeometry();
-    activeGeo.setAttribute('position', new THREE.BufferAttribute(activePositions, 3));
-    const activeLineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
-    const activeLine = new THREE.Line(activeGeo, activeLineMat);
-    scene.add(activeLine);
+    // Active trajectory (bright trail)
+    const trailCount = 300;
+    const trailPositions = new Float32Array(trailCount * 3);
+    const trailGeo = new THREE.BufferGeometry();
+    trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+    const trailMat = new THREE.LineBasicMaterial({ color: 0x88bbff, transparent: true, opacity: 0.6 });
+    scene.add(new THREE.Line(trailGeo, trailMat));
 
-    // ========== ORION MARKER ==========
-    const orionGeo = new THREE.SphereGeometry(0.12, 16, 16);
-    const orionMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const orion = new THREE.Mesh(orionGeo, orionMat);
-    scene.add(orion);
+    // ========== ORION CAPSULE ==========
+    const capsuleGroup = new THREE.Group();
+    const coneMesh = new THREE.Mesh(
+      new THREE.ConeGeometry(0.08, 0.22, 8),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0x444444, emissiveIntensity: 0.5, shininess: 80 })
+    );
+    coneMesh.rotation.x = Math.PI;
+    capsuleGroup.add(coneMesh);
+    scene.add(capsuleGroup);
 
     // Orion glow
-    const orionGlowGeo = new THREE.SphereGeometry(0.25, 16, 16);
-    const orionGlowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 });
-    const orionGlow = new THREE.Mesh(orionGlowGeo, orionGlowMat);
+    const orionGlowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 });
+    const orionGlow = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), orionGlowMat);
     scene.add(orionGlow);
 
-    // ========== BACKGROUND STARS ==========
-    const starCount = 800;
-    const starPositions = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 60 + Math.random() * 40;
-      starPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      starPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      starPositions[i * 3 + 2] = r * Math.cos(phi);
+    // ========== ENGINE BURN PARTICLES ==========
+    const burnCount = 200;
+    const burnPos = new Float32Array(burnCount * 3);
+    const burnCol = new Float32Array(burnCount * 3);
+    const burnVel = [], burnLife = [];
+    for (let i = 0; i < burnCount; i++) {
+      burnPos[i*3] = burnPos[i*3+1] = burnPos[i*3+2] = 0;
+      burnCol[i*3] = 1; burnCol[i*3+1] = 0.8; burnCol[i*3+2] = 0.3;
+      burnVel.push({ x:0, y:0, z:0 });
+      burnLife.push(0);
     }
-    const starGeo = new THREE.BufferGeometry();
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.6 });
-    scene.add(new THREE.Points(starGeo, starMat));
+    const burnGeo = new THREE.BufferGeometry();
+    burnGeo.setAttribute('position', new THREE.BufferAttribute(burnPos, 3));
+    burnGeo.setAttribute('color', new THREE.BufferAttribute(burnCol, 3));
+    const burnMat = new THREE.PointsMaterial({
+      size: 0.07, vertexColors: true, transparent: true, opacity: 0.8,
+      blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+    });
+    scene.add(new THREE.Points(burnGeo, burnMat));
 
-    // ========== LABELS (Earth & Moon) ==========
-    function createLabel(text, position) {
-      const c = document.createElement('canvas');
-      c.width = 256; c.height = 64;
-      const ctx = c.getContext('2d');
-      ctx.font = '600 20px monospace';
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.textAlign = 'center';
-      ctx.fillText(text, 128, 40);
-      const tex = new THREE.CanvasTexture(c);
-      const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-      const sprite = new THREE.Sprite(spriteMat);
-      sprite.position.copy(position);
-      sprite.position.y -= 3;
-      sprite.scale.set(3, 0.75, 1);
-      scene.add(sprite);
+    // ========== RE-ENTRY HEAT EFFECT ==========
+    const heatMat = new THREE.MeshBasicMaterial({
+      color: 0xff4400, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    const heatShield = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), heatMat);
+    scene.add(heatShield);
+
+    // Re-entry trail particles
+    const reentryCount = 100;
+    const reentryPos = new Float32Array(reentryCount * 3);
+    const reentryCol = new Float32Array(reentryCount * 3);
+    const reentryVel = [], reentryLife = [];
+    for (let i = 0; i < reentryCount; i++) {
+      reentryPos[i*3+1] = -100;
+      reentryCol[i*3] = 1; reentryCol[i*3+1] = 0.3; reentryCol[i*3+2] = 0.05;
+      reentryVel.push({ x:0,y:0,z:0 }); reentryLife.push(0);
+    }
+    const reentryGeo = new THREE.BufferGeometry();
+    reentryGeo.setAttribute('position', new THREE.BufferAttribute(reentryPos, 3));
+    reentryGeo.setAttribute('color', new THREE.BufferAttribute(reentryCol, 3));
+    scene.add(new THREE.Points(reentryGeo, new THREE.PointsMaterial({
+      size: 0.06, vertexColors: true, transparent: true, opacity: 0.7,
+      blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+    })));
+
+    // ========== SEPARATION DEBRIS ==========
+    const debrisCount = 80;
+    const debrisPos = new Float32Array(debrisCount * 3);
+    const debrisVel = [], debrisLife = [];
+    for (let i = 0; i < debrisCount; i++) {
+      debrisPos[i*3+1] = -100;
+      debrisVel.push({ x:0,y:0,z:0 }); debrisLife.push(0);
+    }
+    const debrisGeo = new THREE.BufferGeometry();
+    debrisGeo.setAttribute('position', new THREE.BufferAttribute(debrisPos, 3));
+    scene.add(new THREE.Points(debrisGeo, new THREE.PointsMaterial({
+      color: 0xffaa44, size: 0.05, transparent: true, opacity: 0.7,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    })));
+
+    // ========== BACKGROUND STARS ==========
+    const bgStarCount = 1200;
+    const bgStarPos = new Float32Array(bgStarCount * 3);
+    for (let i = 0; i < bgStarCount; i++) {
+      const th = Math.random() * Math.PI * 2;
+      const ph = Math.acos(2 * Math.random() - 1);
+      const r = 60 + Math.random() * 40;
+      bgStarPos[i*3]   = r * Math.sin(ph) * Math.cos(th);
+      bgStarPos[i*3+1] = r * Math.sin(ph) * Math.sin(th);
+      bgStarPos[i*3+2] = r * Math.cos(ph);
+    }
+    const bgStarGeo = new THREE.BufferGeometry();
+    bgStarGeo.setAttribute('position', new THREE.BufferAttribute(bgStarPos, 3));
+    scene.add(new THREE.Points(bgStarGeo, new THREE.PointsMaterial({
+      color: 0xffffff, size: 0.15, transparent: true, opacity: 0.6,
+    })));
+
+    // ========== LABELS ==========
+    function createLabel(text, pos, yOff = -3) {
+      const cv = document.createElement('canvas');
+      cv.width = 256; cv.height = 64;
+      const cx = cv.getContext('2d');
+      cx.font = '600 20px monospace';
+      cx.fillStyle = 'rgba(255,255,255,0.3)';
+      cx.textAlign = 'center';
+      cx.fillText(text, 128, 40);
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false,
+      }));
+      sp.position.copy(pos);
+      sp.position.y += yOff;
+      sp.scale.set(3, 0.75, 1);
+      scene.add(sp);
     }
     createLabel('EARTH', earth.position);
     createLabel('MOON', moon.position);
 
-    // ========== STAGE BUTTONS ==========
+    // Launch pad marker
+    const padMat2 = new THREE.MeshBasicMaterial({
+      color: 0xff4444, transparent: true, opacity: 0.6, side: THREE.DoubleSide,
+    });
+    const padMarker = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.12, 16), padMat2);
+    padMarker.position.copy(curvePoints[0]);
+    padMarker.lookAt(earth.position);
+    scene.add(padMarker);
+
+    // ========== STAGE UI ==========
     const stagesContainer = document.getElementById('trajectoryStages');
     const titleEl = document.getElementById('trajTitle');
     const descEl = document.getElementById('trajDesc');
-    let currentT = 0;
-    let targetT = 0;
-    let currentStageIdx = 0;
-    let autoPlay = true;
-    let autoTimer = 0;
+    const telemetryEl = document.getElementById('trajTelemetry');
+    let currentT = 0, targetT = 0, currentStageIdx = 0;
+    let autoPlay = true, autoTimer = 0;
+    let sepTriggered = {};
+    let burnIdx = 0, debrisIdx = 0, reentryIdx = 0;
 
+    stagesContainer.innerHTML = '';
     stages.forEach((s, i) => {
       const btn = document.createElement('button');
       btn.className = 'trajectory-stage-btn' + (i === 0 ? ' active' : '');
       btn.textContent = s.name;
       btn.addEventListener('click', () => {
-        targetT = s.t;
-        currentStageIdx = i;
-        autoPlay = false;
+        targetT = s.t; currentStageIdx = i;
+        autoPlay = false; sepTriggered = {};
         updateStageUI();
       });
       stagesContainer.appendChild(btn);
     });
 
     function updateStageUI() {
-      const btns = stagesContainer.querySelectorAll('.trajectory-stage-btn');
-      btns.forEach((b, i) => b.classList.toggle('active', i === currentStageIdx));
-      titleEl.textContent = stages[currentStageIdx].name;
-      descEl.textContent = stages[currentStageIdx].desc;
+      stagesContainer.querySelectorAll('.trajectory-stage-btn').forEach((b, i) =>
+        b.classList.toggle('active', i === currentStageIdx));
+      const s = stages[currentStageIdx];
+      titleEl.textContent = s.name;
+      descEl.textContent = s.desc;
+      if (telemetryEl) {
+        telemetryEl.innerHTML = `
+          <div class="telemetry-item"><div class="telemetry-value">${s.tPlus}</div><div class="telemetry-label">Mission Time</div></div>
+          <div class="telemetry-item"><div class="telemetry-value">${s.alt}</div><div class="telemetry-label">Altitude</div></div>
+          <div class="telemetry-item"><div class="telemetry-value">${s.speed}</div><div class="telemetry-label">Velocity</div></div>
+          <div class="telemetry-item"><div class="telemetry-value">${s.dist}</div><div class="telemetry-label">Distance from Earth</div></div>`;
+      }
+    }
+    updateStageUI();
+
+    // ========== PARTICLE SPAWN ==========
+    function spawnBurn(origin, dir) {
+      const i = burnIdx++ % burnCount;
+      const sp = 0.15;
+      burnPos[i*3] = origin.x; burnPos[i*3+1] = origin.y; burnPos[i*3+2] = origin.z;
+      burnVel[i] = {
+        x: dir.x*0.03 + (Math.random()-0.5)*sp*0.03,
+        y: dir.y*0.03 + (Math.random()-0.5)*sp*0.03,
+        z: dir.z*0.03 + (Math.random()-0.5)*sp*0.03,
+      };
+      burnLife[i] = 1;
+      burnCol[i*3] = 1; burnCol[i*3+1] = 0.5+Math.random()*0.5; burnCol[i*3+2] = Math.random()*0.3;
+    }
+
+    function spawnDebrisAt(origin) {
+      for (let j = 0; j < 20; j++) {
+        const i = debrisIdx++ % debrisCount;
+        debrisPos[i*3] = origin.x; debrisPos[i*3+1] = origin.y; debrisPos[i*3+2] = origin.z;
+        debrisVel[i] = {
+          x: (Math.random()-0.5)*0.08,
+          y: (Math.random()-0.5)*0.08,
+          z: (Math.random()-0.5)*0.08,
+        };
+        debrisLife[i] = 1;
+      }
+    }
+
+    function spawnReentry(origin, dir) {
+      const i = reentryIdx++ % reentryCount;
+      reentryPos[i*3] = origin.x; reentryPos[i*3+1] = origin.y; reentryPos[i*3+2] = origin.z;
+      reentryVel[i] = {
+        x: -dir.x*0.04 + (Math.random()-0.5)*0.02,
+        y: -dir.y*0.04 + (Math.random()-0.5)*0.02,
+        z: -dir.z*0.04 + (Math.random()-0.5)*0.02,
+      };
+      reentryLife[i] = 1;
+      reentryCol[i*3] = 1; reentryCol[i*3+1] = 0.2+Math.random()*0.3; reentryCol[i*3+2] = 0.05;
     }
 
     // ========== ANIMATION LOOP ==========
     function animate(time) {
       requestAnimationFrame(animate);
 
-      // Auto-play through stages
+      // Auto-play
       if (autoPlay) {
-        autoTimer += 0.003;
-        const stageTime = 4; // seconds per stage cycle
-        const cycleT = (autoTimer % (stages.length * stageTime)) / (stages.length * stageTime);
-        // Find which stage we're in
+        autoTimer += 0.002;
+        const cyc = stages.length * 5;
+        const ct = (autoTimer % cyc) / cyc;
         let idx = 0;
         for (let i = stages.length - 1; i >= 0; i--) {
-          if (cycleT >= stages[i].t / 1.1) { idx = i; break; }
+          if (ct >= stages[i].t / 1.05) { idx = i; break; }
         }
         targetT = stages[idx].t;
         if (idx !== currentStageIdx) {
-          currentStageIdx = idx;
-          updateStageUI();
+          currentStageIdx = idx; updateStageUI();
         }
       }
 
       // Smooth interpolation
-      currentT += (targetT - currentT) * 0.03;
+      currentT += (targetT - currentT) * 0.025;
+      const clampT = Math.min(Math.max(currentT, 0), 0.999);
 
-      // Update Orion position
-      const pos = curve.getPoint(Math.min(currentT, 0.999));
-      orion.position.copy(pos);
-      orionGlow.position.copy(pos);
+      // Orion position & orientation
+      const oPos = curve.getPoint(clampT);
+      const oTan = curve.getTangent(Math.min(Math.max(currentT, 0.001), 0.998));
+      capsuleGroup.position.copy(oPos);
+      capsuleGroup.lookAt(oPos.x + oTan.x, oPos.y + oTan.y, oPos.z + oTan.z);
+      orionGlow.position.copy(oPos);
+      heatShield.position.copy(oPos);
 
-      // Update active trail
-      const trailSegments = Math.floor(currentT * activePoints);
-      for (let i = 0; i < activePoints; i++) {
-        const t = i / activePoints;
-        if (i <= trailSegments) {
-          const p = curve.getPoint(Math.min(t * currentT / (trailSegments / activePoints || 1), 0.999));
-          activePositions[i * 3] = p.x;
-          activePositions[i * 3 + 1] = p.y;
-          activePositions[i * 3 + 2] = p.z;
+      // Active trail
+      const segs = Math.max(Math.floor(currentT * trailCount), 2);
+      for (let i = 0; i < trailCount; i++) {
+        if (i <= segs) {
+          const p = curve.getPoint(Math.min((i / trailCount) * currentT, 0.999));
+          trailPositions[i*3] = p.x; trailPositions[i*3+1] = p.y; trailPositions[i*3+2] = p.z;
         } else {
-          // Park remaining points at Orion's position
-          activePositions[i * 3] = pos.x;
-          activePositions[i * 3 + 1] = pos.y;
-          activePositions[i * 3 + 2] = pos.z;
+          trailPositions[i*3] = oPos.x; trailPositions[i*3+1] = oPos.y; trailPositions[i*3+2] = oPos.z;
         }
       }
-      activeGeo.attributes.position.needsUpdate = true;
-      activeGeo.setDrawRange(0, Math.max(trailSegments, 2));
+      trailGeo.attributes.position.needsUpdate = true;
+      trailGeo.setDrawRange(0, segs);
 
-      // Gentle rotation
+      const stage = stages[currentStageIdx];
+
+      // Engine burn particles
+      if (stage.burn && Math.abs(currentT - targetT) < 0.12) {
+        const dir = oTan.clone().negate();
+        for (let j = 0; j < 4; j++) spawnBurn(oPos, dir);
+      }
+
+      // Update burn particles
+      for (let i = 0; i < burnCount; i++) {
+        if (burnLife[i] > 0) {
+          burnLife[i] -= 0.02;
+          burnPos[i*3] += burnVel[i].x; burnPos[i*3+1] += burnVel[i].y; burnPos[i*3+2] += burnVel[i].z;
+          burnCol[i*3+1] *= 0.98;
+        } else {
+          burnPos[i*3+1] = -100;
+        }
+      }
+      burnGeo.attributes.position.needsUpdate = true;
+      burnGeo.attributes.color.needsUpdate = true;
+
+      // Separation debris
+      if (stage.sep && !sepTriggered[currentStageIdx] && Math.abs(currentT - stage.t) < 0.015) {
+        spawnDebrisAt(oPos);
+        sepTriggered[currentStageIdx] = true;
+      }
+
+      for (let i = 0; i < debrisCount; i++) {
+        if (debrisLife[i] > 0) {
+          debrisLife[i] -= 0.012;
+          debrisPos[i*3] += debrisVel[i].x; debrisPos[i*3+1] += debrisVel[i].y; debrisPos[i*3+2] += debrisVel[i].z;
+          debrisVel[i].x *= 0.98; debrisVel[i].y *= 0.98; debrisVel[i].z *= 0.98;
+        } else {
+          debrisPos[i*3+1] = -100;
+        }
+      }
+      debrisGeo.attributes.position.needsUpdate = true;
+
+      // Re-entry heat
+      if (stage.reentry) {
+        heatMat.opacity = 0.3 + Math.sin(time * 0.004) * 0.15;
+        heatMat.color.setHex(Math.sin(time * 0.003) > 0 ? 0xff4400 : 0xff6600);
+        for (let j = 0; j < 5; j++) spawnReentry(oPos, oTan);
+      } else {
+        heatMat.opacity *= 0.92;
+      }
+
+      for (let i = 0; i < reentryCount; i++) {
+        if (reentryLife[i] > 0) {
+          reentryLife[i] -= 0.018;
+          reentryPos[i*3] += reentryVel[i].x; reentryPos[i*3+1] += reentryVel[i].y; reentryPos[i*3+2] += reentryVel[i].z;
+          reentryCol[i*3+1] *= 0.97;
+        } else {
+          reentryPos[i*3+1] = -100;
+        }
+      }
+      reentryGeo.attributes.position.needsUpdate = true;
+      reentryGeo.attributes.color.needsUpdate = true;
+
+      // Rotate bodies
       earth.rotation.y += 0.002;
       moon.rotation.y += 0.001;
 
-      // Subtle camera sway
-      camera.position.x = 0 + Math.sin(time * 0.0001) * 0.5;
-      camera.position.y = 8 + Math.cos(time * 0.00015) * 0.3;
-      camera.lookAt(2, 0, 0);
+      // Pulse pad marker
+      padMat2.opacity = 0.3 + Math.sin(time * 0.005) * 0.3;
+
+      // Smooth camera transition
+      targetCamPos.x = stage.cam.x; targetCamPos.y = stage.cam.y; targetCamPos.z = stage.cam.z;
+      targetCamLook.x = stage.look.x; targetCamLook.y = stage.look.y; targetCamLook.z = stage.look.z;
+
+      camPos.x += (targetCamPos.x - camPos.x) * 0.02;
+      camPos.y += (targetCamPos.y - camPos.y) * 0.02;
+      camPos.z += (targetCamPos.z - camPos.z) * 0.02;
+      camLook.x += (targetCamLook.x - camLook.x) * 0.02;
+      camLook.y += (targetCamLook.y - camLook.y) * 0.02;
+      camLook.z += (targetCamLook.z - camLook.z) * 0.02;
+
+      const sway = Math.sin(time * 0.0001) * 0.3;
+      const swayY = Math.cos(time * 0.00015) * 0.15;
+      camera.position.set(camPos.x + sway, camPos.y + swayY, camPos.z);
+      camera.lookAt(camLook.x, camLook.y, camLook.z);
 
       renderer.render(scene, camera);
     }
 
-    // Only run when section is visible
+    // Only animate when visible
     const trajSection = document.getElementById('trajectory');
     let animating = false;
     const trajObserver = new IntersectionObserver((entries) => {
       entries.forEach(e => {
-        if (e.isIntersecting && !animating) {
-          animating = true;
-          requestAnimationFrame(animate);
-        }
+        if (e.isIntersecting && !animating) { animating = true; requestAnimationFrame(animate); }
         if (!e.isIntersecting) animating = false;
       });
     }, { threshold: 0.1 });
