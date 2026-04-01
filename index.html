@@ -349,18 +349,19 @@
 
     /* ========== FADE-IN ========== */
     .fade-in {
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
-    }
-    .js-loaded .fade-in {
       opacity: 0;
       transform: translateY(24px);
     }
-    .js-loaded .fade-in.visible { opacity: 1; transform: translateY(0); }
-    .fade-in-delay-1 { transition-delay: 0.1s; }
-    .fade-in-delay-2 { transition-delay: 0.2s; }
-    .fade-in-delay-3 { transition-delay: 0.3s; }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-in.animate {
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .fade-in.animate.fade-in-delay-1 { transition-delay: 0.1s; }
+    .fade-in.animate.fade-in-delay-2 { transition-delay: 0.2s; }
+    .fade-in.animate.fade-in-delay-3 { transition-delay: 0.3s; }
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-16px); }
       to { opacity: 1; transform: translateY(0); }
@@ -868,6 +869,72 @@
       padding-bottom: 1.5rem;
     }
 
+    /* ========== TRAJECTORY SECTION ========== */
+    #trajectory {
+      background: linear-gradient(180deg, transparent, rgba(5,5,15,0.8), transparent);
+      padding: 6rem 2rem;
+    }
+    .trajectory-container {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    #trajectoryCanvas {
+      width: 100%;
+      height: 600px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.04);
+      background: rgba(0,0,0,0.3);
+    }
+    .trajectory-stages {
+      display: flex;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    .trajectory-stage-btn {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .trajectory-stage-btn:hover {
+      border-color: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.6);
+    }
+    .trajectory-stage-btn.active {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+    .trajectory-info {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .trajectory-info-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+    .trajectory-info-desc {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.35);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
     /* ========== FOOTER ========== */
     footer {
       position: relative;
@@ -944,6 +1011,8 @@
       .facts-grid { grid-template-columns: repeat(2, 1fr); }
       .watch-grid { grid-template-columns: 1fr; }
       .comparison-table th, .comparison-table td { padding: 0.8rem 0.75rem; font-size: 0.8rem; }
+      #trajectoryCanvas { height: 400px; }
+      .trajectory-stage-btn { padding: 0.4rem 0.6rem; font-size: 0.5rem; }
       .footer-inner { flex-direction: column; gap: 1.5rem; text-align: center; align-items: center; }
       .footer-links { align-items: center; }
       .hero-moon { width: 300px; height: 300px; }
@@ -965,6 +1034,7 @@
       <a href="https://www.nasa.gov/mission/artemis-ii/" target="_blank" rel="noopener" class="nav-logo">ARTEMIS II</a>
       <ul class="nav-links" id="navLinks">
         <li><a href="#overview">Mission</a></li>
+        <li><a href="#trajectory">Trajectory</a></li>
         <li><a href="#crew">Crew</a></li>
         <li><a href="#vehicles">Vehicles</a></li>
         <li><a href="#timeline">Timeline</a></li>
@@ -1060,6 +1130,23 @@
           <div class="stat-value">4</div>
           <div class="stat-label">Crew Members</div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trajectory Visualization -->
+  <section id="trajectory">
+    <div class="trajectory-container">
+      <div class="section-header fade-in" style="text-align:center;">
+        <div class="section-tag">Flight Path</div>
+        <h2 class="section-title">MISSION TRAJECTORY</h2>
+        <div class="section-line" style="margin:1.5rem auto 0;"></div>
+      </div>
+      <canvas id="trajectoryCanvas"></canvas>
+      <div class="trajectory-stages" id="trajectoryStages"></div>
+      <div class="trajectory-info">
+        <div class="trajectory-info-title" id="trajTitle">PRE-LAUNCH</div>
+        <div class="trajectory-info-desc" id="trajDesc">Awaiting liftoff from Kennedy Space Center, Pad 39B.</div>
       </div>
     </div>
   </section>
@@ -1653,18 +1740,29 @@
     setInterval(updateCountdown, 1000);
 
     // ========== SCROLL ANIMATIONS ==========
-    // Mark elements already in viewport as visible before enabling animations
     const fadeEls = document.querySelectorAll('.fade-in');
+    // Instantly show elements already in viewport (no transition)
     fadeEls.forEach(el => {
       const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight) el.classList.add('visible');
+      if (rect.top < window.innerHeight) {
+        el.classList.add('visible');
+      }
     });
-    document.body.classList.add('js-loaded');
+    // Enable transitions only for elements not yet visible
+    requestAnimationFrame(() => {
+      fadeEls.forEach(el => {
+        if (!el.classList.contains('visible')) el.classList.add('animate');
+      });
+    });
 
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('animate', 'visible');
+        }
+      });
     }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    fadeEls.forEach(el => observer.observe(el));
+    fadeEls.forEach(el => { if (!el.classList.contains('visible')) observer.observe(el); });
 
     // ========== NAV ==========
     const navbar = document.getElementById('navbar');
@@ -1685,6 +1783,291 @@
         item.classList.toggle('open');
       });
     });
+  </script>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js" } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    // ========== MISSION STAGES ==========
+    const stages = [
+      { t: 0.0,  name: 'PRE-LAUNCH',      desc: 'Awaiting liftoff from Kennedy Space Center, Pad 39B.' },
+      { t: 0.02, name: 'LIFTOFF',          desc: 'SLS ignites its 4 RS-25 engines and 2 solid rocket boosters. 8.8 million lbs of thrust.' },
+      { t: 0.04, name: 'SRB SEPARATION',   desc: 'Solid rocket boosters burn out and separate 2 minutes after launch at ~100,000 ft.' },
+      { t: 0.07, name: 'CORE STAGE SEP',   desc: 'Core stage engines cut off. ICPS upper stage takes over to reach orbit.' },
+      { t: 0.12, name: 'EARTH ORBIT',      desc: 'Orion enters a high elliptical Earth orbit. Systems checkout and proximity operations with ICPS.' },
+      { t: 0.2,  name: 'TLI BURN',         desc: 'A critical 6-minute burn sends Orion on a free-return trajectory toward the Moon at ~25,000 mph.' },
+      { t: 0.45, name: 'OUTBOUND COAST',   desc: 'Four-day coast through deep space. Crew monitors systems and gathers radiation data.' },
+      { t: 0.55, name: 'LUNAR FLYBY',      desc: 'Orion passes within ~4,600 miles of the Moon. 30-50 minute radio blackout behind the far side.' },
+      { t: 0.75, name: 'RETURN COAST',     desc: 'Lunar gravity slingshots Orion back toward Earth. Three correction burns fine-tune the approach.' },
+      { t: 0.92, name: 'RE-ENTRY',         desc: 'Fastest crewed re-entry ever at 25,000 mph. Skip-entry technique reduces G-forces to ~4g.' },
+      { t: 1.0,  name: 'SPLASHDOWN',       desc: 'Parachutes deploy. Orion splashes down in the Pacific Ocean. Recovery teams retrieve the crew.' },
+    ];
+
+    // ========== SCENE SETUP ==========
+    const canvasEl = document.getElementById('trajectoryCanvas');
+    const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, canvasEl.clientWidth / canvasEl.clientHeight, 0.1, 1000);
+    camera.position.set(0, 8, 18);
+    camera.lookAt(2, 0, 0);
+
+    function resize() {
+      const w = canvasEl.clientWidth;
+      const h = canvasEl.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // ========== EARTH ==========
+    const earthGeo = new THREE.SphereGeometry(2, 48, 48);
+    const earthMat = new THREE.MeshStandardMaterial({
+      color: 0x1a3a5c,
+      roughness: 0.8,
+      metalness: 0.1,
+      emissive: 0x0a1520,
+      emissiveIntensity: 0.3,
+    });
+    const earth = new THREE.Mesh(earthGeo, earthMat);
+    earth.position.set(-4, 0, 0);
+    scene.add(earth);
+
+    // Earth atmosphere glow
+    const glowGeo = new THREE.SphereGeometry(2.15, 48, 48);
+    const glowMat = new THREE.MeshBasicMaterial({
+      color: 0x4488cc,
+      transparent: true,
+      opacity: 0.08,
+      side: THREE.BackSide,
+    });
+    const glow = new THREE.Mesh(glowGeo, glowMat);
+    glow.position.copy(earth.position);
+    scene.add(glow);
+
+    // ========== MOON ==========
+    const moonGeo = new THREE.SphereGeometry(0.7, 32, 32);
+    const moonMat = new THREE.MeshStandardMaterial({
+      color: 0x888888,
+      roughness: 1,
+      metalness: 0,
+      emissive: 0x222222,
+      emissiveIntensity: 0.2,
+    });
+    const moon = new THREE.Mesh(moonGeo, moonMat);
+    moon.position.set(10, 0.5, -1);
+    scene.add(moon);
+
+    // Moon glow
+    const moonGlowGeo = new THREE.SphereGeometry(0.85, 32, 32);
+    const moonGlowMat = new THREE.MeshBasicMaterial({
+      color: 0xaaaaaa,
+      transparent: true,
+      opacity: 0.05,
+      side: THREE.BackSide,
+    });
+    const moonGlow = new THREE.Mesh(moonGlowGeo, moonGlowMat);
+    moonGlow.position.copy(moon.position);
+    scene.add(moonGlow);
+
+    // ========== LIGHTS ==========
+    const ambient = new THREE.AmbientLight(0x334466, 0.6);
+    scene.add(ambient);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    sunLight.position.set(-15, 8, 10);
+    scene.add(sunLight);
+    const rimLight = new THREE.DirectionalLight(0x4466aa, 0.4);
+    rimLight.position.set(10, -5, -5);
+    scene.add(rimLight);
+
+    // ========== TRAJECTORY CURVE ==========
+    const curvePoints = [
+      new THREE.Vector3(-4, 0, 2.1),       // Launch from Earth surface
+      new THREE.Vector3(-3, 1.5, 3),        // Ascent
+      new THREE.Vector3(-1, 2.5, 2),        // Earth orbit
+      new THREE.Vector3(2, 3, 0.5),         // TLI / outbound
+      new THREE.Vector3(6, 2, -0.5),        // Coast
+      new THREE.Vector3(9.5, 1, -1.2),      // Near Moon
+      new THREE.Vector3(11, 0.5, -2),       // Behind Moon (flyby)
+      new THREE.Vector3(10, -0.5, -0.5),    // Swing back
+      new THREE.Vector3(6, -1.5, 1),        // Return coast
+      new THREE.Vector3(2, -2, 2),          // Approach Earth
+      new THREE.Vector3(-2, -1, 2.5),       // Re-entry
+      new THREE.Vector3(-3.5, -0.3, 2.2),   // Splashdown near Earth
+    ];
+    const curve = new THREE.CatmullRomCurve3(curvePoints);
+
+    // Full trajectory line (dim)
+    const fullLineGeo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(200));
+    const fullLineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.06 });
+    const fullLine = new THREE.Line(fullLineGeo, fullLineMat);
+    scene.add(fullLine);
+
+    // Active trajectory line (bright, partial)
+    const activePoints = 200;
+    const activePositions = new Float32Array(activePoints * 3);
+    const activeGeo = new THREE.BufferGeometry();
+    activeGeo.setAttribute('position', new THREE.BufferAttribute(activePositions, 3));
+    const activeLineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
+    const activeLine = new THREE.Line(activeGeo, activeLineMat);
+    scene.add(activeLine);
+
+    // ========== ORION MARKER ==========
+    const orionGeo = new THREE.SphereGeometry(0.12, 16, 16);
+    const orionMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const orion = new THREE.Mesh(orionGeo, orionMat);
+    scene.add(orion);
+
+    // Orion glow
+    const orionGlowGeo = new THREE.SphereGeometry(0.25, 16, 16);
+    const orionGlowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 });
+    const orionGlow = new THREE.Mesh(orionGlowGeo, orionGlowMat);
+    scene.add(orionGlow);
+
+    // ========== BACKGROUND STARS ==========
+    const starCount = 800;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = 60 + Math.random() * 40;
+      starPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      starPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      starPositions[i * 3 + 2] = r * Math.cos(phi);
+    }
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.6 });
+    scene.add(new THREE.Points(starGeo, starMat));
+
+    // ========== LABELS (Earth & Moon) ==========
+    function createLabel(text, position) {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 64;
+      const ctx = c.getContext('2d');
+      ctx.font = '600 20px monospace';
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, 128, 40);
+      const tex = new THREE.CanvasTexture(c);
+      const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.position.copy(position);
+      sprite.position.y -= 3;
+      sprite.scale.set(3, 0.75, 1);
+      scene.add(sprite);
+    }
+    createLabel('EARTH', earth.position);
+    createLabel('MOON', moon.position);
+
+    // ========== STAGE BUTTONS ==========
+    const stagesContainer = document.getElementById('trajectoryStages');
+    const titleEl = document.getElementById('trajTitle');
+    const descEl = document.getElementById('trajDesc');
+    let currentT = 0;
+    let targetT = 0;
+    let currentStageIdx = 0;
+    let autoPlay = true;
+    let autoTimer = 0;
+
+    stages.forEach((s, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'trajectory-stage-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = s.name;
+      btn.addEventListener('click', () => {
+        targetT = s.t;
+        currentStageIdx = i;
+        autoPlay = false;
+        updateStageUI();
+      });
+      stagesContainer.appendChild(btn);
+    });
+
+    function updateStageUI() {
+      const btns = stagesContainer.querySelectorAll('.trajectory-stage-btn');
+      btns.forEach((b, i) => b.classList.toggle('active', i === currentStageIdx));
+      titleEl.textContent = stages[currentStageIdx].name;
+      descEl.textContent = stages[currentStageIdx].desc;
+    }
+
+    // ========== ANIMATION LOOP ==========
+    function animate(time) {
+      requestAnimationFrame(animate);
+
+      // Auto-play through stages
+      if (autoPlay) {
+        autoTimer += 0.003;
+        const stageTime = 4; // seconds per stage cycle
+        const cycleT = (autoTimer % (stages.length * stageTime)) / (stages.length * stageTime);
+        // Find which stage we're in
+        let idx = 0;
+        for (let i = stages.length - 1; i >= 0; i--) {
+          if (cycleT >= stages[i].t / 1.1) { idx = i; break; }
+        }
+        targetT = stages[idx].t;
+        if (idx !== currentStageIdx) {
+          currentStageIdx = idx;
+          updateStageUI();
+        }
+      }
+
+      // Smooth interpolation
+      currentT += (targetT - currentT) * 0.03;
+
+      // Update Orion position
+      const pos = curve.getPoint(Math.min(currentT, 0.999));
+      orion.position.copy(pos);
+      orionGlow.position.copy(pos);
+
+      // Update active trail
+      const trailSegments = Math.floor(currentT * activePoints);
+      for (let i = 0; i < activePoints; i++) {
+        const t = i / activePoints;
+        if (i <= trailSegments) {
+          const p = curve.getPoint(Math.min(t * currentT / (trailSegments / activePoints || 1), 0.999));
+          activePositions[i * 3] = p.x;
+          activePositions[i * 3 + 1] = p.y;
+          activePositions[i * 3 + 2] = p.z;
+        } else {
+          // Park remaining points at Orion's position
+          activePositions[i * 3] = pos.x;
+          activePositions[i * 3 + 1] = pos.y;
+          activePositions[i * 3 + 2] = pos.z;
+        }
+      }
+      activeGeo.attributes.position.needsUpdate = true;
+      activeGeo.setDrawRange(0, Math.max(trailSegments, 2));
+
+      // Gentle rotation
+      earth.rotation.y += 0.002;
+      moon.rotation.y += 0.001;
+
+      // Subtle camera sway
+      camera.position.x = 0 + Math.sin(time * 0.0001) * 0.5;
+      camera.position.y = 8 + Math.cos(time * 0.00015) * 0.3;
+      camera.lookAt(2, 0, 0);
+
+      renderer.render(scene, camera);
+    }
+
+    // Only run when section is visible
+    const trajSection = document.getElementById('trajectory');
+    let animating = false;
+    const trajObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !animating) {
+          animating = true;
+          requestAnimationFrame(animate);
+        }
+        if (!e.isIntersecting) animating = false;
+      });
+    }, { threshold: 0.1 });
+    trajObserver.observe(trajSection);
   </script>
 </body>
 </html>
